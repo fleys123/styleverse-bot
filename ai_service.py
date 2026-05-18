@@ -116,7 +116,7 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
         # Step 1: face-to-full-portrait — portrait shot in scene with reference photo
         scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
             "image_urls": [person_url],
-            "prompt": f"{scene_prompt}, subtle bokeh background, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
+            "prompt": f"{scene_prompt}, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
             "image_size": "portrait_4_3",
             "guidance_scale": 6.0,
             "num_inference_steps": 50,
