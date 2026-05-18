@@ -44,14 +44,14 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on a beach in Miami at golden sunset, palm trees, ocean waves"),
-    ("🗼 Токио ночью",        "in Tokyo at night, neon lights, Shibuya crossing, cyberpunk city"),
-    ("🏔 Снежные горы",       "in snowy mountains, dramatic alpine peaks, clear blue sky"),
-    ("🎬 Красная дорожка",    "on a red carpet at a glamorous Hollywood film premiere, photographers"),
-    ("🌆 Нью-Йорк",          "in New York City Manhattan, Times Square, busy urban street"),
-    ("🏙 Дубай",             "in Dubai with luxury skyscrapers, futuristic architecture, golden hour"),
-    ("🌴 Тропический остров", "on a tropical island, turquoise water, white sand beach, paradise"),
-    ("🌸 Японский сад",       "in a Japanese garden with cherry blossom, sakura petals, peaceful spring"),
+    ("🏖 Пляж Майами",       "on a beach in Miami, golden sunset light, warm breeze, candid moment, natural expression, shallow depth of field, 35mm film"),
+    ("🗼 Токио ночью",        "in Tokyo at night, neon reflections on wet pavement, Shibuya crossing, candid street photography, natural pose, cinematic"),
+    ("🏔 Снежные горы",       "in snowy mountains, dramatic peaks in background, soft natural light, candid photography, cozy winter atmosphere, Kodak Portra"),
+    ("🎬 Красная дорожка",    "on a glamorous red carpet, photographers in background, soft studio lighting, elegant atmosphere, candid confident pose"),
+    ("🌆 Нью-Йорк",          "in New York City, Manhattan streets, natural city light, candid urban photography, busy city life background, 35mm film"),
+    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers background, warm sunlight, candid travel photography, natural expression"),
+    ("🌴 Тропический остров", "on a tropical island, turquoise water behind, soft natural light, candid vacation photo, relaxed natural pose, golden hour"),
+    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura petals falling, soft diffused light, candid serene moment, film photography"),
 ]
 
 

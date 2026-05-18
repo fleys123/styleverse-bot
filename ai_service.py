@@ -118,8 +118,8 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
             "image_urls": [person_url],
             "prompt": (
                 f"portrait photo, upper body shot, face and shoulders, {scene_prompt}, "
-                "professional photoshoot, studio quality, sharp focus, cinematic lighting, "
-                "photorealistic, high quality"
+                "candid photography, natural light, shallow depth of field, "
+                "35mm film, Kodak Portra, photorealistic, high quality"
             ),
             "image_size": "portrait_4_3",
             "guidance_scale": 6.0,
