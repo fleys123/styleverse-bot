@@ -252,6 +252,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Используй /start чтобы начать.")
 
 
+ADMIN_ID = 835360588
+
+
 async def _generate_scene(update, context, scene_prompt: str, status_msg):
     user_id = update.effective_user.id
     person_path = storage.get_profile_photo_path(user_id)
@@ -264,9 +267,22 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
     except Exception as e:
         logger.error(f"Scene failed for user {user_id}: {e}")
         await status_msg.edit_text(
-            f"❌ Ошибка генерации. Попробуй другую сцену.\n\nДетали: {str(e)[:120]}",
+            "❌ Ошибка генерации. Повторите попытку через 1-5 минут.",
             reply_markup=BACK_BTN,
         )
+        try:
+            user = update.effective_user
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=(
+                    f"🚨 Ошибка генерации\n\n"
+                    f"👤 Пользователь: {user.full_name} (@{user.username}, id={user_id})\n"
+                    f"🎬 Сцена: {scene_prompt}\n\n"
+                    f"❗️ {str(e)}"
+                ),
+            )
+        except Exception:
+            pass
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
