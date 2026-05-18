@@ -117,8 +117,8 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
         scene_result = _subscribe("fal-ai/nano-banana-pro", {
             "prompt": (
                 f"Place this exact person {scene_prompt} "
-                "Do not change the person's face, hair, body, clothing or any accessories. "
-                "Only change the background and environment. "
+                "Do not change the person's face or hair. "
+                "Only change the background, environment and adapt the outfit to the scene. "
                 "Photorealistic photo, natural light, high quality."
             ),
             "image_url": person_url,
