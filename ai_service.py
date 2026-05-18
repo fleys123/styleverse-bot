@@ -113,12 +113,13 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: generate scene naturally from scratch — correct lighting and blending
+        # Step 1: generate portrait shot — face and shoulders only, no body distortion
         scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
             "image_urls": [person_url],
             "prompt": (
-                f"{scene_prompt}, same slim body build and proportions as the reference person, "
-                "same clothing, photorealistic, high quality, cinematic lighting, sharp focus"
+                f"portrait photo, upper body shot, face and shoulders, {scene_prompt}, "
+                "professional photoshoot, studio quality, sharp focus, cinematic lighting, "
+                "photorealistic, high quality"
             ),
             "image_size": "portrait_4_3",
             "guidance_scale": 6.0,
@@ -185,11 +186,12 @@ async def insert_into_scene_lora(
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: flux-lora generates person in scene using trained identity
+        # Step 1: flux-lora generates portrait shot in scene
         scene_result = _subscribe("fal-ai/flux-lora", {
             "prompt": (
-                f"photo of {trigger_word} person, {scene_prompt}, "
-                "photorealistic, high quality, detailed, cinematic lighting, sharp focus"
+                f"portrait photo of {trigger_word} person, upper body shot, face and shoulders, "
+                f"{scene_prompt}, professional photoshoot, studio quality, "
+                "cinematic lighting, sharp focus, photorealistic, high quality"
             ),
             "loras": [{"path": lora_url, "scale": 0.85}],
             "image_size": "portrait_4_3",
