@@ -203,14 +203,7 @@ async def insert_into_scene_lora(
             "num_images": 1,
             "output_format": "jpeg",
         })
-        scene_url = scene_result["images"][0]["url"]
-
-        # Step 2: face-swap — paste exact face from original photo
-        final = _subscribe("fal-ai/face-swap", {
-            "base_image_url": scene_url,
-            "swap_image_url": person_url,
-        })
-        return final["image"]["url"]
+        return scene_result["images"][0]["url"]
 
     return await asyncio.to_thread(_run)
 
