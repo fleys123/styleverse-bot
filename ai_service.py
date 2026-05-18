@@ -118,13 +118,20 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
             "image_urls": [person_url],
             "prompt": scene_prompt,
             "image_size": "portrait_4_3",
-            "guidance_scale": 4.0,
+            "guidance_scale": 6.0,
             "num_inference_steps": 50,
             "num_images": 1,
-            "lora_scale": 0.85,
+            "lora_scale": 1.0,
             "output_format": "jpeg",
         })
-        return scene_result["images"][0]["url"]
+        scene_url = scene_result["images"][0]["url"]
+
+        # Step 2: face-swap — restore exact face from original photo
+        final = _subscribe("fal-ai/face-swap", {
+            "base_image_url": scene_url,
+            "swap_image_url": person_url,
+        })
+        return final["image"]["url"]
 
     return await asyncio.to_thread(_run)
 
