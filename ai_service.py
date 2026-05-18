@@ -113,23 +113,17 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: Nano Banana PRO — reasoning model, places exact person in scene
+        # Nano Banana PRO — reasoning model, places exact person in scene
         scene_result = _subscribe("fal-ai/nano-banana-pro", {
             "prompt": (
-                f"Place this exact person {scene_prompt}. "
-                "Keep the face and full appearance identical to the reference. "
+                f"Place this exact person {scene_prompt} "
+                "Do not change the person's face, hair, body, clothing or any accessories. "
+                "Only change the background and environment. "
                 "Photorealistic photo, natural light, high quality."
             ),
             "image_url": person_url,
         })
-        scene_url = scene_result["images"][0]["url"]
-
-        # Step 2: face-swap — paste exact face from original photo
-        final = _subscribe("fal-ai/face-swap", {
-            "base_image_url": scene_url,
-            "swap_image_url": person_url,
-        })
-        return final["image"]["url"]
+        return scene_result["images"][0]["url"]
 
     return await asyncio.to_thread(_run)
 
