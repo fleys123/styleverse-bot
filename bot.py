@@ -379,15 +379,8 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
     user_id = update.effective_user.id
     person_path = storage.get_profile_photo_path(user_id)
     chat_id = update.effective_chat.id
-    lora_data = storage.get_user_lora(user_id)
-
     try:
-        if lora_data:
-            result_url = await ai_service.insert_into_scene_lora(
-                person_path, scene_prompt, lora_data["url"], lora_data["trigger"]
-            )
-        else:
-            result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
+        result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         await status_msg.delete()
         await _send_result(chat_id, context, person_path, result_url, f"✨ Ты в сцене: {scene_prompt}")
     except Exception as e:
