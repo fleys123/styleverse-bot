@@ -37,14 +37,14 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on a beach in Miami, golden sunset light, warm breeze, candid moment, natural expression, shallow depth of field, 35mm film"),
-    ("🗼 Токио ночью",        "in Tokyo at night, neon reflections on wet pavement, Shibuya crossing, candid street photography, natural pose, cinematic"),
-    ("🏔 Снежные горы",       "in snowy mountains, dramatic peaks in background, soft natural light, candid photography, cozy winter atmosphere, Kodak Portra"),
-    ("🎬 Красная дорожка",    "on a glamorous red carpet, photographers in background, soft studio lighting, elegant atmosphere, candid confident pose"),
-    ("🌆 Нью-Йорк",          "in New York City, Manhattan streets, natural city light, candid urban photography, busy city life background, 35mm film"),
-    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers background, warm sunlight, candid travel photography, natural expression"),
-    ("🌴 Тропический остров", "on a tropical island, turquoise water behind, soft natural light, candid vacation photo, relaxed natural pose, golden hour"),
-    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura petals falling, soft diffused light, candid serene moment, film photography"),
+    ("🏖 Пляж Майами",       "on a Miami beach at golden sunset, ocean waves in the background, warm golden light"),
+    ("🗼 Токио ночью",        "in Tokyo at night, neon lights and Shibuya crossing in the background, wet pavement reflections, cinematic atmosphere"),
+    ("🏔 Снежные горы",       "in snowy mountains, dramatic alpine peaks in the background, soft natural winter light"),
+    ("🎬 Красная дорожка",    "on a glamorous red carpet event, photographers and camera flashes in the background, elegant venue lighting"),
+    ("🌆 Нью-Йорк",          "on Manhattan streets in New York City, iconic skyline in the background, natural city light"),
+    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers in the background, warm sunset light"),
+    ("🌴 Тропический остров", "on a tropical island paradise, turquoise water and palm trees in the background, golden hour light"),
+    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura petals falling, soft diffused spring light"),
 ]
 
 

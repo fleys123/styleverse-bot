@@ -113,14 +113,15 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: FLUX Kontext Max — edit scene around the person keeping their appearance
+        # Step 1: FLUX Kontext Max — place person in new scene, keep appearance unchanged
         scene_result = _subscribe("fal-ai/flux-pro/kontext/max", {
             "image_url": person_url,
             "prompt": (
-                f"portrait photo, {scene_prompt}, "
-                "candid photography, natural light, photorealistic, high quality"
+                f"Place this exact person {scene_prompt}. "
+                "Keep the person's face, body, and clothing completely unchanged. "
+                "Only change the background and environment. Photorealistic, high quality photography."
             ),
-            "guidance_scale": 3.5,
+            "guidance_scale": 4.5,
             "num_images": 1,
             "output_format": "jpeg",
         })
