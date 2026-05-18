@@ -41,14 +41,14 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on a Miami beach at golden sunset, ocean waves and palm trees in background, warm soft sunlight, relaxed vacation atmosphere"),
-    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing in background, soft neon city glow, wet pavement reflections, moody cinematic atmosphere"),
-    ("🏔 Снежные горы",       "in snowy mountains, dramatic alpine peaks in background, crisp natural winter light, cozy cold atmosphere"),
-    ("🎬 Красная дорожка",    "at a glamorous red carpet event, elegant venue in background, soft warm studio lighting, sophisticated atmosphere"),
-    ("🌆 Нью-Йорк",          "on Manhattan streets in New York City, iconic skyline in background, overcast natural city light, urban street atmosphere"),
-    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers in background, warm amber sunset light, upscale travel atmosphere"),
-    ("🌴 Тропический остров", "on a tropical island, turquoise water and palm trees in background, soft golden hour light, relaxed summer atmosphere"),
-    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura trees in background, soft diffused spring light, peaceful serene atmosphere"),
+    ("🏖 Пляж Майами",       "on Miami beach at sunset"),
+    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing"),
+    ("🏔 Снежные горы",       "in the snowy mountains"),
+    ("🎬 Красная дорожка",    "on a red carpet event"),
+    ("🌆 Нью-Йорк",          "on a Manhattan street in New York City"),
+    ("🏙 Дубай",             "in Dubai with skyline view"),
+    ("🌴 Тропический остров", "on a tropical island beach"),
+    ("🌸 Японский сад",       "in a Japanese cherry blossom garden"),
 ]
 
 
