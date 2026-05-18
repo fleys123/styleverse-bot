@@ -54,18 +54,10 @@ SCENE_PRESETS = [
 
 def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboardMarkup:
     if has_photo:
-        if has_lora:
-            buttons = [
-                [InlineKeyboardButton("🌍 Вставить себя в сцену ✨", callback_data="scene")],
-                [InlineKeyboardButton("🔄 Переобучить AI-аватар", callback_data="train_lora")],
-                [InlineKeyboardButton("🔄 Обновить фото профиля", callback_data="update_photo")],
-            ]
-        else:
-            buttons = [
-                [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
-                [InlineKeyboardButton("🧠 Создать AI-аватар — макс. качество", callback_data="train_lora")],
-                [InlineKeyboardButton("🔄 Обновить фото профиля", callback_data="update_photo")],
-            ]
+        buttons = [
+            [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
+            [InlineKeyboardButton("🔄 Обновить своё фото", callback_data="update_photo")],
+        ]
     else:
         buttons = [[InlineKeyboardButton("📸 Загрузить своё фото", callback_data="update_photo")]]
     return InlineKeyboardMarkup(buttons)
