@@ -37,14 +37,14 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on a Miami beach at golden sunset. Ocean waves in background, warm golden sunlight. Keep the person's face and hair exactly as in the reference photo."),
-    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing in background, neon lights reflecting on wet pavement. Keep the person's face and hair exactly as in the reference photo."),
-    ("🏔 Снежные горы",       "in snowy mountains, dramatic alpine peaks in background, soft natural winter light. Keep the person's face and hair exactly as in the reference photo."),
-    ("🎬 Красная дорожка",    "on a glamorous red carpet event, camera flashes and photographers in background, elegant venue. Keep the person's face and hair exactly as in the reference photo."),
-    ("🌆 Нью-Йорк",          "on Manhattan streets in New York City, iconic skyline in background, natural city light. Keep the person's face and hair exactly as in the reference photo."),
-    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers in background, warm sunset light. Keep the person's face and hair exactly as in the reference photo."),
-    ("🌴 Тропический остров", "on a tropical island paradise, turquoise water and palm trees in background, golden hour light. Keep the person's face and hair exactly as in the reference photo."),
-    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura petals falling, soft diffused spring light. Keep the person's face and hair exactly as in the reference photo."),
+    ("🏖 Пляж Майами",       "on a Miami beach at golden sunset, ocean waves and palm trees in background, warm soft sunlight, relaxed vacation atmosphere"),
+    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing in background, soft neon city glow, wet pavement reflections, moody cinematic atmosphere"),
+    ("🏔 Снежные горы",       "in snowy mountains, dramatic alpine peaks in background, crisp natural winter light, cozy cold atmosphere"),
+    ("🎬 Красная дорожка",    "at a glamorous red carpet event, elegant venue in background, soft warm studio lighting, sophisticated atmosphere"),
+    ("🌆 Нью-Йорк",          "on Manhattan streets in New York City, iconic skyline in background, overcast natural city light, urban street atmosphere"),
+    ("🏙 Дубай",             "in Dubai at golden hour, luxury skyscrapers in background, warm amber sunset light, upscale travel atmosphere"),
+    ("🌴 Тропический остров", "on a tropical island, turquoise water and palm trees in background, soft golden hour light, relaxed summer atmosphere"),
+    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, sakura trees in background, soft diffused spring light, peaceful serene atmosphere"),
 ]
 
 

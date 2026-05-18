@@ -113,15 +113,21 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: Nano Banana PRO — places person in scene with adapted outfit
-        scene_result = _subscribe("fal-ai/nano-banana-pro", {
+        # Step 1: face-to-full-portrait — portrait shot in scene with reference photo
+        scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+            "image_urls": [person_url],
             "prompt": (
-                f"Place this exact person {scene_prompt} "
-                "Do not change the person's face or hair. "
-                "Only change the background, environment and adapt the outfit to the scene. "
-                "Photorealistic photo, natural light, high quality."
+                f"portrait photo, upper body shot, face and shoulders, {scene_prompt}, "
+                "candid photography, muted realistic colors, natural light, "
+                "shot on 35mm film, Kodak Portra 400, shallow depth of field, "
+                "correct anatomy, well-proportioned, photorealistic, high quality"
             ),
-            "image_url": person_url,
+            "image_size": "portrait_4_3",
+            "guidance_scale": 6.0,
+            "num_inference_steps": 50,
+            "num_images": 1,
+            "lora_scale": 1.0,
+            "output_format": "jpeg",
         })
         scene_url = scene_result["images"][0]["url"]
 
