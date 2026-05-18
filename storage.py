@@ -1,9 +1,12 @@
 import json
+import os
 from pathlib import Path
 
-PHOTO_DIR = Path("user_photos")
-TEMP_DIR = Path("temp")
-LORA_DIR = Path("user_loras")
+_BASE = Path("/app/data") if Path("/app/data").exists() else Path(".")
+
+PHOTO_DIR = _BASE / "user_photos"
+TEMP_DIR = _BASE / "temp"
+LORA_DIR = _BASE / "user_loras"
 
 PHOTO_DIR.mkdir(exist_ok=True)
 TEMP_DIR.mkdir(exist_ok=True)
