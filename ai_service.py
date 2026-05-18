@@ -113,19 +113,15 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: generate portrait shot using reference photo for consistent body/appearance
-        scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
-            "image_urls": [person_url],
+        # Step 1: FLUX Kontext Max — edit scene around the person keeping their appearance
+        scene_result = _subscribe("fal-ai/flux-pro/kontext/max", {
+            "image_url": person_url,
             "prompt": (
-                f"portrait photo, upper body shot, face and shoulders, {scene_prompt}, "
-                "candid photography, natural light, shallow depth of field, "
-                "35mm film, Kodak Portra, photorealistic, high quality"
+                f"portrait photo, {scene_prompt}, "
+                "candid photography, natural light, photorealistic, high quality"
             ),
-            "image_size": "portrait_4_3",
-            "guidance_scale": 6.0,
-            "num_inference_steps": 50,
+            "guidance_scale": 3.5,
             "num_images": 1,
-            "lora_scale": 1.0,
             "output_format": "jpeg",
         })
         scene_url = scene_result["images"][0]["url"]
