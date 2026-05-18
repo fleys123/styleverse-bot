@@ -113,15 +113,14 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: PuLID — generate person in scene using reference photo for face consistency
-        scene_result = _subscribe("fal-ai/pulid", {
+        # Step 1: Nano Banana PRO — reasoning model, places exact person in scene
+        scene_result = _subscribe("fal-ai/nano-banana-pro", {
             "prompt": (
-                f"portrait photo of a person {scene_prompt}, "
-                "candid photography, natural light, photorealistic, high quality"
+                f"Place this exact person {scene_prompt}. "
+                "Keep the face and full appearance identical to the reference. "
+                "Photorealistic photo, natural light, high quality."
             ),
-            "reference_images": [{"image_url": person_url}],
-            "num_images": 1,
-            "output_format": "jpeg",
+            "image_url": person_url,
         })
         scene_url = scene_result["images"][0]["url"]
 
