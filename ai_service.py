@@ -187,17 +187,19 @@ async def insert_into_scene_lora(
     def _run():
         person_url = _upload(person_path)
 
-        # Step 1: flux-lora generates portrait shot in scene
+        # Step 1: flux-lora generates portrait shot in scene using personal LoRA
         scene_result = _subscribe("fal-ai/flux-lora", {
             "prompt": (
-                f"portrait photo of {trigger_word} person, upper body shot, face and shoulders, "
-                f"{scene_prompt}, professional photoshoot, studio quality, "
-                "cinematic lighting, sharp focus, photorealistic, high quality"
+                f"portrait photo of {trigger_word}, upper body shot, face and shoulders, "
+                f"{scene_prompt}, candid photography, muted realistic colors, natural light, "
+                "shot on 35mm film, Kodak Portra 400, shallow depth of field, "
+                "correct anatomy, photorealistic, high quality"
             ),
-            "loras": [{"path": lora_url, "scale": 0.85}],
+            "negative_prompt": "deformed, ugly, cartoon, oversaturated, bad anatomy, extra limbs",
+            "loras": [{"path": lora_url, "scale": 1.0}],
             "image_size": "portrait_4_3",
-            "num_inference_steps": 35,
-            "guidance_scale": 3.5,
+            "num_inference_steps": 50,
+            "guidance_scale": 4.0,
             "num_images": 1,
             "output_format": "jpeg",
         })

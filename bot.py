@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 STATE_IDLE = "idle"
 STATE_WAITING_PROFILE = "waiting_profile"
 STATE_WAITING_SCENE = "waiting_scene"
+STATE_TRAINING_COLLECTING = "training_collecting"
+
+MIN_TRAINING_PHOTOS = 5
+MAX_TRAINING_PHOTOS = 15
 
 BACK_BTN = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 В меню", callback_data="menu")]])
 
@@ -48,14 +52,32 @@ SCENE_PRESETS = [
 ]
 
 
-def main_menu_keyboard(has_photo: bool) -> InlineKeyboardMarkup:
+def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboardMarkup:
     if has_photo:
-        buttons = [
-            [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
-            [InlineKeyboardButton("🔄 Обновить своё фото", callback_data="update_photo")],
-        ]
+        if has_lora:
+            buttons = [
+                [InlineKeyboardButton("🌍 Вставить себя в сцену ✨", callback_data="scene")],
+                [InlineKeyboardButton("🔄 Переобучить AI-аватар", callback_data="train_lora")],
+                [InlineKeyboardButton("🔄 Обновить фото профиля", callback_data="update_photo")],
+            ]
+        else:
+            buttons = [
+                [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
+                [InlineKeyboardButton("🧠 Создать AI-аватар — макс. качество", callback_data="train_lora")],
+                [InlineKeyboardButton("🔄 Обновить фото профиля", callback_data="update_photo")],
+            ]
     else:
         buttons = [[InlineKeyboardButton("📸 Загрузить своё фото", callback_data="update_photo")]]
+    return InlineKeyboardMarkup(buttons)
+
+
+def training_keyboard(photo_count: int) -> InlineKeyboardMarkup:
+    buttons = []
+    if photo_count >= MIN_TRAINING_PHOTOS:
+        buttons.append([InlineKeyboardButton(
+            f"🚀 Начать обучение ({photo_count} фото)", callback_data="train_start"
+        )])
+    buttons.append([InlineKeyboardButton("🔙 В меню", callback_data="menu")])
     return InlineKeyboardMarkup(buttons)
 
 
@@ -82,9 +104,10 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     has_photo = storage.has_profile_photo(user_id)
 
     if has_photo:
+        has_lora = storage.has_user_lora(user_id)
         await update.message.reply_text(
             "✨ С возвращением в StyleVerse!\n\nВыбери что хочешь сделать:",
-            reply_markup=main_menu_keyboard(True)
+            reply_markup=main_menu_keyboard(True, has_lora)
         )
         return
 
@@ -146,7 +169,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "menu":
         context.user_data["state"] = STATE_IDLE
         has_photo = storage.has_profile_photo(user_id)
-        kb = main_menu_keyboard(has_photo)
+        has_lora = storage.has_user_lora(user_id)
+        kb = main_menu_keyboard(has_photo, has_lora)
         try:
             await query.edit_message_text("Выбери действие:", reply_markup=kb)
         except Exception:
@@ -170,6 +194,40 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=scene_preset_keyboard(),
         )
 
+    elif query.data == "train_lora":
+        if not storage.has_profile_photo(user_id):
+            await query.edit_message_text(
+                "Сначала загрузи своё фото!", reply_markup=main_menu_keyboard(False)
+            )
+            return
+        context.user_data["state"] = STATE_TRAINING_COLLECTING
+        context.user_data["training_photos"] = []
+        await query.edit_message_text(
+            "🧠 СОЗДАНИЕ AI-АВАТАРА\n\n"
+            "Загрузи 5–15 своих фотографий. Чем больше — тем лучше результат.\n\n"
+            "📌 Требования к фото:\n"
+            "• Разные ракурсы лица (анфас, профиль, 3/4)\n"
+            "• Разное освещение и фон\n"
+            "• Лицо чёткое, не размытое\n"
+            "• Без солнечных очков\n"
+            "• Только ты, без других людей\n\n"
+            "⏳ Обучение займёт ~10–15 минут. Я напишу когда будет готово.\n\n"
+            "Начинай присылать фото 👇",
+            reply_markup=training_keyboard(0),
+        )
+
+    elif query.data == "train_start":
+        photos = context.user_data.get("training_photos", [])
+        if len(photos) < MIN_TRAINING_PHOTOS:
+            await query.answer(f"Нужно минимум {MIN_TRAINING_PHOTOS} фото!", show_alert=True)
+            return
+        context.user_data["state"] = STATE_IDLE
+        status_msg = await query.edit_message_text(
+            f"⏳ Начинаю обучение на {len(photos)} фото...\n"
+            "Это займёт 10–15 минут. Можешь пока закрыть бот — я напишу когда готово."
+        )
+        asyncio.create_task(_start_training(update, context, photos, status_msg))
+
     elif query.data.startswith("sp_"):
         idx = query.data[3:]
         if idx == "custom":
@@ -191,11 +249,40 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     state = context.user_data.get("state", STATE_IDLE)
-    if state == STATE_WAITING_PROFILE:
+    if state == STATE_TRAINING_COLLECTING:
+        await _collect_training_photo(update, context)
+    elif state == STATE_WAITING_PROFILE:
         await _save_profile_photo(update, context)
     else:
         context.user_data["state"] = STATE_WAITING_PROFILE
         await _save_profile_photo(update, context)
+
+
+async def _collect_training_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    photos = context.user_data.setdefault("training_photos", [])
+
+    if len(photos) >= MAX_TRAINING_PHOTOS:
+        await update.message.reply_text(
+            f"Уже набрано максимум {MAX_TRAINING_PHOTOS} фото. Нажми «Начать обучение».",
+            reply_markup=training_keyboard(len(photos)),
+        )
+        return
+
+    photo = update.message.photo[-1]
+    file = await photo.get_file()
+    photo_path = storage.get_temp_dir() / f"{user_id}_train_{len(photos)}.jpg"
+    await file.download_to_drive(str(photo_path))
+    photos.append(str(photo_path))
+
+    count = len(photos)
+    if count < MIN_TRAINING_PHOTOS:
+        remaining = MIN_TRAINING_PHOTOS - count
+        text = f"✅ Фото {count} получено. Пришли ещё минимум {remaining}."
+    else:
+        text = f"✅ Фото {count} получено. Можешь прислать ещё или начать обучение."
+
+    await update.message.reply_text(text, reply_markup=training_keyboard(count))
 
 
 async def _save_profile_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -208,10 +295,11 @@ async def _save_profile_photo(update: Update, context: ContextTypes.DEFAULT_TYPE
     await file.download_to_drive(str(photo_path))
     storage.register_profile_photo(user_id, str(photo_path))
     context.user_data["state"] = STATE_IDLE
+    has_lora = storage.has_user_lora(user_id)
 
     await msg.edit_text(
         "✅ Фото сохранено! Выбери что делать:",
-        reply_markup=main_menu_keyboard(True),
+        reply_markup=main_menu_keyboard(True, has_lora),
     )
 
 
@@ -255,13 +343,51 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ADMIN_ID = 835360588
 
 
+async def _start_training(update, context, photo_paths: list, status_msg):
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
+    try:
+        lora_url, trigger_word = await ai_service.train_user_lora(photo_paths, user_id)
+        storage.save_user_lora(user_id, lora_url, trigger_word)
+        for path in photo_paths:
+            try:
+                Path(path).unlink()
+            except Exception:
+                pass
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="🎉 AI-аватар готов! Теперь генерации будут значительно качественнее.\n\nВыбери сцену:",
+            reply_markup=main_menu_keyboard(True, has_lora=True),
+        )
+    except Exception as e:
+        logger.error(f"LoRA training failed for user {user_id}: {e}")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="❌ Ошибка обучения. Попробуй позже.",
+            reply_markup=main_menu_keyboard(True, has_lora=False),
+        )
+        try:
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=f"🚨 Ошибка обучения LoRA\n\n👤 id={user_id}\n❗️ {str(e)}",
+            )
+        except Exception:
+            pass
+
+
 async def _generate_scene(update, context, scene_prompt: str, status_msg):
     user_id = update.effective_user.id
     person_path = storage.get_profile_photo_path(user_id)
     chat_id = update.effective_chat.id
+    lora_data = storage.get_user_lora(user_id)
 
     try:
-        result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
+        if lora_data:
+            result_url = await ai_service.insert_into_scene_lora(
+                person_path, scene_prompt, lora_data["url"], lora_data["trigger"]
+            )
+        else:
+            result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         await status_msg.delete()
         await _send_result(chat_id, context, person_path, result_url, f"✨ Ты в сцене: {scene_prompt}")
     except Exception as e:
