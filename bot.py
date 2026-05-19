@@ -41,13 +41,13 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on Miami beach at sunset"),
-    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing"),
-    ("🎬 Красная дорожка",    "on a red carpet event"),
-    ("🌆 Нью-Йорк",          "on a Manhattan street in New York City"),
-    ("🏙 Дубай",             "in Dubai with skyline view"),
-    ("🌴 Тропический остров", "on a tropical island beach"),
-    ("🌸 Японский сад",       "in a Japanese cherry blossom garden"),
+    ("🏖 Пляж Майами",       "on Miami beach at sunset, wearing a light linen shirt and shorts"),
+    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing, wearing a stylish urban jacket and dark jeans"),
+    ("🎬 Красная дорожка",    "on a red carpet event, wearing an elegant black suit"),
+    ("🌆 Нью-Йорк",          "on a Manhattan street in New York City, wearing a casual coat and jeans"),
+    ("🏙 Дубай",             "in Dubai with skyline view, wearing a smart casual white shirt and trousers"),
+    ("🌴 Тропический остров", "on a tropical island beach, wearing a casual summer outfit"),
+    ("🌸 Японский сад",       "in a Japanese cherry blossom garden, wearing a light casual outfit"),
 ]
 
 
