@@ -8,10 +8,11 @@ import zipfile
 import fal_client
 from openai import OpenAI
 
-_openrouter = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=os.environ["OPENROUTER_API_KEY"],
-)
+def _get_openrouter() -> OpenAI:
+    return OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=os.environ["OPENROUTER_API_KEY"],
+    )
 
 
 def _upload(path: str) -> str:
@@ -27,7 +28,7 @@ def _upload(path: str) -> str:
 def _get_outfit(photo_path: str, scene_prompt: str) -> str:
     with open(photo_path, "rb") as f:
         image_data = base64.b64encode(f.read()).decode("utf-8")
-    msg = _openrouter.chat.completions.create(
+    msg = _get_openrouter().chat.completions.create(
         model="google/gemini-flash-1.5",
         max_tokens=60,
         messages=[{
