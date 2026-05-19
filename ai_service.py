@@ -1,10 +1,17 @@
 import asyncio
+import base64
 import os
 import tempfile
 import time
 import zipfile
 
 import fal_client
+from openai import OpenAI
+
+_openrouter = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.environ["OPENROUTER_API_KEY"],
+)
 
 
 def _upload(path: str) -> str:
@@ -15,6 +22,34 @@ def _upload(path: str) -> str:
             if attempt == 2:
                 raise
             time.sleep(2 ** attempt)
+
+
+def _get_outfit(photo_path: str, scene_prompt: str) -> str:
+    with open(photo_path, "rb") as f:
+        image_data = base64.b64encode(f.read()).decode("utf-8")
+    msg = _openrouter.chat.completions.create(
+        model="google/gemini-flash-1.5",
+        max_tokens=60,
+        messages=[{
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
+                },
+                {
+                    "type": "text",
+                    "text": (
+                        f"This person will be placed in this scene: {scene_prompt}. "
+                        "Suggest a specific outfit that fits both their personal style and the scene. "
+                        "Reply with ONLY 3-6 words starting with 'wearing', e.g. 'wearing a casual linen shirt'. "
+                        "No explanation, no punctuation at the end."
+                    ),
+                },
+            ],
+        }],
+    )
+    return msg.choices[0].message.content.strip()
 
 
 def _subscribe(model: str, arguments: dict, timeout: int = 120) -> dict:
@@ -112,11 +147,12 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     """
     def _run():
         person_url = _upload(person_path)
+        outfit = _get_outfit(person_path, scene_prompt)
 
         # Step 1: face-to-full-portrait — portrait shot in scene with reference photo
         scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
             "image_urls": [person_url],
-            "prompt": f"{scene_prompt}, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
+            "prompt": f"{scene_prompt}, {outfit}, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
             "image_size": "portrait_4_3",
             "guidance_scale": 6.0,
             "num_inference_steps": 50,
