@@ -43,7 +43,6 @@ RESULT_BTNS = InlineKeyboardMarkup([
 SCENE_PRESETS = [
     ("🏖 Пляж Майами",       "on Miami beach at sunset"),
     ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing"),
-    ("🏔 Снежные горы",       "in the snowy mountains"),
     ("🎬 Красная дорожка",    "on a red carpet event"),
     ("🌆 Нью-Йорк",          "on a Manhattan street in New York City"),
     ("🏙 Дубай",             "in Dubai with skyline view"),
