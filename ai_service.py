@@ -29,7 +29,7 @@ def _get_outfit(photo_path: str, scene_prompt: str) -> str:
     with open(photo_path, "rb") as f:
         image_data = base64.b64encode(f.read()).decode("utf-8")
     msg = _get_openrouter().chat.completions.create(
-        model="google/gemini-flash-1.5",
+        model="google/gemini-2.0-flash-001",
         max_tokens=60,
         messages=[{
             "role": "user",
