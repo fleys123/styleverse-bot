@@ -59,6 +59,7 @@ def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboar
         ]
     else:
         buttons = [[InlineKeyboardButton("📸 Загрузить своё фото", callback_data="update_photo")]]
+    buttons.append([InlineKeyboardButton("💬 Тех поддержка", url="https://t.me/Fleys2")])
     return InlineKeyboardMarkup(buttons)
 
 
