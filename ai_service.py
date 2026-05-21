@@ -140,11 +140,6 @@ async def tryon_in_scene(
 
 
 STYLE_PROMPTS = {
-    "anime": (
-        "anime style portrait illustration, Studio Ghibli inspired art, "
-        "beautiful detailed anime character, soft watercolor colors, "
-        "cinematic anime scene, high quality anime art"
-    ),
     "gta": (
         "GTA V loading screen art style, Rockstar Games character portrait, "
         "urban street background, gritty digital illustration, "
@@ -154,27 +149,26 @@ STYLE_PROMPTS = {
 
 
 async def apply_style(person_path: str, style: str) -> str:
-    """Apply art style: step 1 — place in epic scene, step 2 — FLUX Kontext transforms to style."""
+    """Apply art style: manga uses FLUX Kontext directly; GTA uses face-to-full-portrait + face-swap."""
     def _run():
         person_url = _upload(person_path)
 
-        if style == "anime":
-            # Direct FLUX Kontext on original photo — preserves face, adds anime style + scene
+        if style == "manga":
             result = _subscribe("fal-ai/flux-kontext", {
                 "image_url": person_url,
                 "prompt": (
-                    "Transform this person into modern anime style illustration, "
-                    "cel-shaded clean art, bold crisp outlines, "
-                    "Demon Slayer and Jujutsu Kaisen visual style, "
-                    "vibrant saturated colors, dynamic cinematic background scene, "
-                    "keep the same face structure and expression, "
-                    "NOT watercolor, NOT soft, sharp digital art"
+                    "Transform into black and white manga illustration, "
+                    "bold ink linework, heavy cross-hatching for shadows, "
+                    "manga panel art style, dynamic close-up portrait, "
+                    "high contrast, sharp ink lines, no color, "
+                    "professional manga artist style like Slam Dunk or Vagabond, "
+                    "keep the same face and features"
                 ),
             })
             return result["images"][0]["url"]
 
         else:
-            # GTA and other styles: face-to-full-portrait + face-swap
+            # GTA: face-to-full-portrait + face-swap
             style_prompt = STYLE_PROMPTS[style]
             result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
                 "image_urls": [person_url],

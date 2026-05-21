@@ -42,7 +42,7 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 STYLE_PRESETS = [
-    ("🎌 Аниме", "anime"),
+    ("🖤 Манга", "manga"),
     ("🎮 GTA", "gta"),
 ]
 
