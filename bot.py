@@ -15,6 +15,7 @@ from telegram.ext import (
 )
 
 import ai_service
+import database
 import storage
 
 load_dotenv()
@@ -103,7 +104,14 @@ def scene_preset_keyboard() -> InlineKeyboardMarkup:
 # ─── Commands ────────────────────────────────────────────────────────────────
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
+    user = update.effective_user
+    user_id = user.id
+    database.register_user(user_id, user.username, user.full_name)
+
+    if database.is_banned(user_id):
+        await update.message.reply_text("🚫 Доступ заблокирован.")
+        return
+
     context.user_data["state"] = STATE_IDLE
     has_photo = storage.has_profile_photo(user_id)
 
@@ -433,6 +441,7 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
     chat_id = update.effective_chat.id
     try:
         result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
+        database.increment_generation(user_id)
         await status_msg.delete()
         await _send_result(chat_id, context, person_path, result_url, f"✨ Ты в сцене: {scene_prompt}")
     except Exception as e:
@@ -458,7 +467,7 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
-def main():
+def build_app() -> Application:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
         raise ValueError("Укажи TELEGRAM_BOT_TOKEN в .env")
@@ -476,10 +485,9 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-
-    logger.info("StyleVerse запущен. Ctrl+C для остановки.")
-    app.run_polling()
+    return app
 
 
 if __name__ == "__main__":
-    main()
+    database.init_db()
+    build_app().run_polling()
