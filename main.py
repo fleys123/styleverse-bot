@@ -16,13 +16,19 @@ import admin_bot
 
 
 def run_main():
-    logging.info("Starting main bot...")
-    main_bot.build_app().run_polling()
+    try:
+        logging.info("Starting main bot...")
+        main_bot.build_app().run_polling()
+    except Exception as e:
+        logging.error(f"Main bot crashed: {e}", exc_info=True)
 
 
 def run_admin():
-    logging.info("Starting admin bot...")
-    admin_bot.build_app().run_polling()
+    try:
+        logging.info("Starting admin bot...")
+        admin_bot.build_app().run_polling()
+    except Exception as e:
+        logging.error(f"Admin bot crashed: {e}", exc_info=True)
 
 
 if __name__ == "__main__":
