@@ -435,6 +435,12 @@ async def _generate_style(update, context, style_key: str, label: str, status_ms
     user_id = update.effective_user.id
     person_path = storage.get_profile_photo_path(user_id)
     chat_id = update.effective_chat.id
+    if not person_path:
+        await status_msg.edit_text(
+            "Фото не найдено. Загрузи своё фото заново:",
+            reply_markup=main_menu_keyboard(False),
+        )
+        return
     try:
         result_url = await ai_service.apply_style(person_path, style_key)
         await status_msg.delete()
@@ -465,6 +471,12 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
     user_id = update.effective_user.id
     person_path = storage.get_profile_photo_path(user_id)
     chat_id = update.effective_chat.id
+    if not person_path:
+        await status_msg.edit_text(
+            "Фото не найдено. Загрузи своё фото заново:",
+            reply_markup=main_menu_keyboard(False),
+        )
+        return
     try:
         result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         database.increment_generation(user_id)
