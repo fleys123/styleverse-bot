@@ -61,7 +61,6 @@ def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboar
     if has_photo:
         buttons = [
             [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
-            [InlineKeyboardButton("🎨 Стили", callback_data="styles")],
             [InlineKeyboardButton("🔄 Обновить своё фото", callback_data="update_photo")],
         ]
     else:
