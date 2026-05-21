@@ -437,7 +437,7 @@ async def _generate_style(update, context, style_key: str, label: str, status_ms
     chat_id = update.effective_chat.id
     if not person_path:
         await status_msg.edit_text(
-            "Фото не найдено. Загрузи своё фото заново:",
+            "Фото не найдено. Пожалуйста, загрузите своё фото заново:",
             reply_markup=main_menu_keyboard(False),
         )
         return
@@ -473,7 +473,7 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
     chat_id = update.effective_chat.id
     if not person_path:
         await status_msg.edit_text(
-            "Фото не найдено. Загрузи своё фото заново:",
+            "Фото не найдено. Пожалуйста, загрузите своё фото заново:",
             reply_markup=main_menu_keyboard(False),
         )
         return
