@@ -1,5 +1,6 @@
+import asyncio
 import logging
-import threading
+import signal
 
 from dotenv import load_dotenv
 
@@ -15,30 +16,37 @@ import bot as main_bot
 import admin_bot
 
 
-def run_main():
-    try:
-        logging.info("Starting main bot...")
-        main_bot.build_app().run_polling()
-    except Exception as e:
-        logging.error(f"Main bot crashed: {e}", exc_info=True)
+async def run():
+    database.init_db()
 
+    app1 = main_bot.build_app()
+    app2 = admin_bot.build_app()
 
-def run_admin():
-    try:
-        logging.info("Starting admin bot...")
-        admin_bot.build_app().run_polling()
-    except Exception as e:
-        logging.error(f"Admin bot crashed: {e}", exc_info=True)
+    await app1.initialize()
+    await app2.initialize()
+
+    await app1.start()
+    await app2.start()
+
+    await app1.updater.start_polling()
+    await app2.updater.start_polling()
+
+    logging.info("Both bots started successfully.")
+
+    stop_event = asyncio.Event()
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, stop_event.set)
+    loop.add_signal_handler(signal.SIGTERM, stop_event.set)
+
+    await stop_event.wait()
+
+    await app1.updater.stop()
+    await app2.updater.stop()
+    await app1.stop()
+    await app2.stop()
+    await app1.shutdown()
+    await app2.shutdown()
 
 
 if __name__ == "__main__":
-    database.init_db()
-
-    t1 = threading.Thread(target=run_main, name="main-bot")
-    t2 = threading.Thread(target=run_admin, name="admin-bot")
-
-    t1.start()
-    t2.start()
-
-    t1.join()
-    t2.join()
+    asyncio.run(run())
