@@ -23,7 +23,10 @@ def _main_kb() -> InlineKeyboardMarkup:
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    uid = update.effective_user.id
+    logger.info(f"[ADMIN BOT] /start from user_id={uid}, is_admin={_is_admin(update)}")
     if not _is_admin(update):
+        await update.message.reply_text("⛔️ Нет доступа.")
         return
     await update.message.reply_text("👑 StyleVerse Admin", reply_markup=_main_kb())
 
