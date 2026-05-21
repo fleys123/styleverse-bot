@@ -36,8 +36,10 @@ MAX_TRAINING_PHOTOS = 15
 
 BACK_BTN = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 В меню", callback_data="menu")]])
 
+CHANNEL = "@StyleVerse_gallery"
+
 RESULT_BTNS = InlineKeyboardMarkup([
-    [InlineKeyboardButton("📤 Поделиться ботом", url="https://t.me/share/url?url=t.me/styleverse_bot&text=Попробуй этот AI-бот — вставляй себя в любые локации! 🔥")],
+    [InlineKeyboardButton("📤 Поделиться в канал", callback_data="share_channel")],
     [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
 ])
 
@@ -186,6 +188,22 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("Выбери действие:", reply_markup=kb)
         except Exception:
             await query.message.reply_text("Выбери действие:", reply_markup=kb)
+
+    elif query.data == "share_channel":
+        result_url = context.user_data.get("last_result_url")
+        if not result_url:
+            await query.answer("Нет результата для публикации.", show_alert=True)
+            return
+        try:
+            await context.bot.send_photo(
+                chat_id=CHANNEL,
+                photo=result_url,
+                caption="✨ Создано в StyleVerse\n\n👉 Попробуй сам: @styleverse_bot",
+            )
+            await query.answer("✅ Опубликовано в канале!", show_alert=True)
+        except Exception as e:
+            logger.error(f"Channel post failed: {e}")
+            await query.answer("Ошибка публикации.", show_alert=True)
 
     elif query.data == "update_photo":
         context.user_data["state"] = STATE_WAITING_PROFILE
@@ -347,6 +365,7 @@ async def _send_result(
     result_url: str,
     caption: str,
 ):
+    context.user_data["last_result_url"] = result_url
     await context.bot.send_media_group(
         chat_id=chat_id,
         media=[
