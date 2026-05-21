@@ -1,6 +1,5 @@
-import asyncio
 import logging
-import os
+import threading
 
 from dotenv import load_dotenv
 
@@ -16,26 +15,24 @@ import bot as main_bot
 import admin_bot
 
 
-async def run():
-    database.init_db()
+def run_main():
+    logging.info("Starting main bot...")
+    main_bot.build_app().run_polling()
 
-    app1 = main_bot.build_app()
-    app2 = admin_bot.build_app()
 
-    async with app1, app2:
-        await app1.start()
-        await app2.start()
-        await app1.updater.start_polling()
-        await app2.updater.start_polling()
-
-        logging.info("Both bots running. Press Ctrl+C to stop.")
-        await asyncio.Event().wait()
-
-        await app1.updater.stop()
-        await app2.updater.stop()
-        await app1.stop()
-        await app2.stop()
+def run_admin():
+    logging.info("Starting admin bot...")
+    admin_bot.build_app().run_polling()
 
 
 if __name__ == "__main__":
-    asyncio.run(run())
+    database.init_db()
+
+    t1 = threading.Thread(target=run_main, name="main-bot")
+    t2 = threading.Thread(target=run_admin, name="admin-bot")
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
