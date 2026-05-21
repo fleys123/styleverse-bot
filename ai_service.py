@@ -159,31 +159,16 @@ async def apply_style(person_path: str, style: str) -> str:
         person_url = _upload(person_path)
 
         if style == "anime":
-            # Step 1: place person in epic scene (model picks location)
-            scene = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
-                "image_urls": [person_url],
-                "prompt": (
-                    "in a cinematic location with beautiful atmosphere, "
-                    "interesting environment, stunning scenery, natural or urban setting, "
-                    "photorealistic, cinematic lighting, sharp focus"
-                ),
-                "image_size": "portrait_4_3",
-                "guidance_scale": 6.0,
-                "num_inference_steps": 50,
-                "num_images": 1,
-                "lora_scale": 1.0,
-                "output_format": "jpeg",
-            })
-            scene_url = scene["images"][0]["url"]
-
-            # Step 2: transform to modern clean anime style via FLUX Kontext
+            # Direct FLUX Kontext on original photo — preserves face, adds anime style + scene
             result = _subscribe("fal-ai/flux-kontext", {
-                "image_url": scene_url,
+                "image_url": person_url,
                 "prompt": (
-                    "Transform into modern anime style illustration, "
-                    "clean sharp linework, cinematic lighting, "
-                    "Your Name and Demon Slayer visual style, "
-                    "vibrant colors, highly detailed, keep the same person and scene composition"
+                    "Transform this person into modern anime style illustration, "
+                    "cel-shaded clean art, bold crisp outlines, "
+                    "Demon Slayer and Jujutsu Kaisen visual style, "
+                    "vibrant saturated colors, dynamic cinematic background scene, "
+                    "keep the same face structure and expression, "
+                    "NOT watercolor, NOT soft, sharp digital art"
                 ),
             })
             return result["images"][0]["url"]
