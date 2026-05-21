@@ -162,7 +162,11 @@ async def apply_style(person_path: str, style: str) -> str:
             # Step 1: place person in epic scene (model picks location)
             scene = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
                 "image_urls": [person_url],
-                "prompt": "in a dramatic cinematic location, photorealistic, stunning background, cinematic lighting",
+                "prompt": (
+                    "in a cinematic location with beautiful atmosphere, "
+                    "interesting environment, stunning scenery, natural or urban setting, "
+                    "photorealistic, cinematic lighting, sharp focus"
+                ),
                 "image_size": "portrait_4_3",
                 "guidance_scale": 6.0,
                 "num_inference_steps": 50,
@@ -172,13 +176,14 @@ async def apply_style(person_path: str, style: str) -> str:
             })
             scene_url = scene["images"][0]["url"]
 
-            # Step 2: transform to anime style via FLUX Kontext
+            # Step 2: transform to modern clean anime style via FLUX Kontext
             result = _subscribe("fal-ai/flux-kontext", {
                 "image_url": scene_url,
                 "prompt": (
-                    "Transform into vibrant anime style illustration, "
-                    "Studio Ghibli inspired, vivid saturated colors, "
-                    "detailed anime art, cinematic composition, keep the same person and scene"
+                    "Transform into modern anime style illustration, "
+                    "clean sharp linework, cinematic lighting, "
+                    "Your Name and Demon Slayer visual style, "
+                    "vibrant colors, highly detailed, keep the same person and scene composition"
                 ),
             })
             return result["images"][0]["url"]
