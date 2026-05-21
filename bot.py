@@ -253,7 +253,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data.startswith("stl_"):
         style_key = query.data[4:]
-        label = next(l for l, k in STYLE_PRESETS if k == style_key)
+        preset = next(((l, k) for l, k in STYLE_PRESETS if k == style_key), None)
+        if preset is None:
+            await query.edit_message_text(
+                "Этот стиль больше недоступен. Выбери актуальный:",
+                reply_markup=style_keyboard(),
+            )
+            return
+        label = preset[0]
         status_msg = await query.edit_message_text(
             f"⏳ {label}...\nГенерирую стилизованное фото (~1-2 минуты)"
         )
@@ -416,10 +423,11 @@ async def _generate_style(update, context, style_key: str, label: str, status_ms
         await _send_result(chat_id, context, person_path, result_url, f"✨ Стиль: {label}")
     except Exception as e:
         logger.error(f"Style failed for user {user_id}: {e}")
-        await status_msg.edit_text(
-            "❌ Ошибка генерации. Повторите попытку через 1-5 минут.",
-            reply_markup=BACK_BTN,
-        )
+        if "content_policy_violation" in str(e):
+            msg = "🚫 Твоё фото не прошло проверку. Попробуй другое фото с чётким лицом."
+        else:
+            msg = "❌ Ошибка генерации. Повторите попытку через 1-5 минут."
+        await status_msg.edit_text(msg, reply_markup=BACK_BTN)
         try:
             user = update.effective_user
             await context.bot.send_message(
