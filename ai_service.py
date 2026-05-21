@@ -154,15 +154,33 @@ async def apply_style(person_path: str, style: str) -> str:
         person_url = _upload(person_path)
 
         if style == "manga":
+            # Step 1: generate dynamic pose in interesting location
+            scene = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+                "image_urls": [person_url],
+                "prompt": (
+                    "dynamic confident pose, upper body shot, "
+                    "urban street or interesting location, "
+                    "cinematic lighting, photorealistic, sharp focus"
+                ),
+                "image_size": "portrait_4_3",
+                "guidance_scale": 6.0,
+                "num_inference_steps": 50,
+                "num_images": 1,
+                "lora_scale": 1.0,
+                "output_format": "jpeg",
+            })
+            scene_url = scene["images"][0]["url"]
+
+            # Step 2: transform to manga style
             result = _subscribe("fal-ai/flux-kontext", {
-                "image_url": person_url,
+                "image_url": scene_url,
                 "prompt": (
                     "Transform into black and white manga illustration, "
                     "bold ink linework, heavy cross-hatching for shadows, "
-                    "manga panel art style, dynamic close-up portrait, "
+                    "manga speed lines in background, screen tone halftone dots, "
                     "high contrast, sharp ink lines, no color, "
-                    "professional manga artist style like Slam Dunk or Vagabond, "
-                    "keep the same face and features"
+                    "Slam Dunk and Vagabond manga style, "
+                    "keep the same face and pose"
                 ),
             })
             return result["images"][0]["url"]
