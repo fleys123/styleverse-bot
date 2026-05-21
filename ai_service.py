@@ -154,27 +154,54 @@ STYLE_PROMPTS = {
 
 
 async def apply_style(person_path: str, style: str) -> str:
-    """Apply art style to person photo using face-to-full-portrait + face-swap."""
-    style_prompt = STYLE_PROMPTS[style]
-
+    """Apply art style: step 1 — place in epic scene, step 2 — FLUX Kontext transforms to style."""
     def _run():
         person_url = _upload(person_path)
-        result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
-            "image_urls": [person_url],
-            "prompt": style_prompt,
-            "image_size": "portrait_4_3",
-            "guidance_scale": 7.0,
-            "num_inference_steps": 50,
-            "num_images": 1,
-            "lora_scale": 0.9,
-            "output_format": "jpeg",
-        })
-        style_url = result["images"][0]["url"]
-        final = _subscribe("fal-ai/face-swap", {
-            "base_image_url": style_url,
-            "swap_image_url": person_url,
-        })
-        return final["image"]["url"]
+
+        if style == "anime":
+            # Step 1: place person in epic scene
+            scene = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+                "image_urls": [person_url],
+                "prompt": "in Tokyo at night, Shibuya crossing, neon lights, cinematic lighting, photorealistic",
+                "image_size": "portrait_4_3",
+                "guidance_scale": 6.0,
+                "num_inference_steps": 50,
+                "num_images": 1,
+                "lora_scale": 1.0,
+                "output_format": "jpeg",
+            })
+            scene_url = scene["images"][0]["url"]
+
+            # Step 2: transform to anime style via FLUX Kontext
+            result = _subscribe("fal-ai/flux-kontext", {
+                "image_url": scene_url,
+                "prompt": (
+                    "Transform into vibrant anime style illustration, "
+                    "Studio Ghibli inspired, vivid saturated colors, "
+                    "detailed anime art, cinematic composition, keep the same person and scene"
+                ),
+            })
+            return result["images"][0]["url"]
+
+        else:
+            # GTA and other styles: face-to-full-portrait + face-swap
+            style_prompt = STYLE_PROMPTS[style]
+            result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+                "image_urls": [person_url],
+                "prompt": style_prompt,
+                "image_size": "portrait_4_3",
+                "guidance_scale": 7.0,
+                "num_inference_steps": 50,
+                "num_images": 1,
+                "lora_scale": 0.9,
+                "output_format": "jpeg",
+            })
+            style_url = result["images"][0]["url"]
+            final = _subscribe("fal-ai/face-swap", {
+                "base_image_url": style_url,
+                "swap_image_url": person_url,
+            })
+            return final["image"]["url"]
 
     return await asyncio.to_thread(_run)
 
