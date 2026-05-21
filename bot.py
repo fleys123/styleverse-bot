@@ -40,6 +40,11 @@ RESULT_BTNS = InlineKeyboardMarkup([
     [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
 ])
 
+STYLE_PRESETS = [
+    ("🎌 Аниме", "anime"),
+    ("🎮 GTA", "gta"),
+]
+
 SCENE_PRESETS = [
     ("🏖 Пляж Майами",       "on Miami beach at sunset"),
     ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing"),
@@ -55,11 +60,18 @@ def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboar
     if has_photo:
         buttons = [
             [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
+            [InlineKeyboardButton("🎨 Стили", callback_data="styles")],
             [InlineKeyboardButton("🔄 Обновить своё фото", callback_data="update_photo")],
         ]
     else:
         buttons = [[InlineKeyboardButton("📸 Загрузить своё фото", callback_data="update_photo")]]
     buttons.append([InlineKeyboardButton("💬 Тех поддержка", url="https://t.me/Fleys2")])
+    return InlineKeyboardMarkup(buttons)
+
+
+def style_keyboard() -> InlineKeyboardMarkup:
+    buttons = [[InlineKeyboardButton(label, callback_data=f"stl_{key}")] for label, key in STYLE_PRESETS]
+    buttons.append([InlineKeyboardButton("🔙 В меню", callback_data="menu")])
     return InlineKeyboardMarkup(buttons)
 
 
@@ -220,6 +232,25 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         asyncio.create_task(_start_training(update, context, photos, status_msg))
 
+    elif query.data == "styles":
+        if not storage.has_profile_photo(user_id):
+            await query.edit_message_text(
+                "Сначала загрузи своё фото!", reply_markup=main_menu_keyboard(False)
+            )
+            return
+        await query.edit_message_text(
+            "🎨 Выбери стиль:",
+            reply_markup=style_keyboard(),
+        )
+
+    elif query.data.startswith("stl_"):
+        style_key = query.data[4:]
+        label = next(l for l, k in STYLE_PRESETS if k == style_key)
+        status_msg = await query.edit_message_text(
+            f"⏳ {label}...\nГенерирую стилизованное фото (~1-2 минуты)"
+        )
+        await _generate_style(update, context, style_key, label, status_msg)
+
     elif query.data.startswith("sp_"):
         idx = query.data[3:]
         if idx == "custom":
@@ -362,6 +393,35 @@ async def _start_training(update, context, photo_paths: list, status_msg):
             await context.bot.send_message(
                 chat_id=ADMIN_ID,
                 text=f"🚨 Ошибка обучения LoRA\n\n👤 id={user_id}\n❗️ {str(e)}",
+            )
+        except Exception:
+            pass
+
+
+async def _generate_style(update, context, style_key: str, label: str, status_msg):
+    user_id = update.effective_user.id
+    person_path = storage.get_profile_photo_path(user_id)
+    chat_id = update.effective_chat.id
+    try:
+        result_url = await ai_service.apply_style(person_path, style_key)
+        await status_msg.delete()
+        await _send_result(chat_id, context, person_path, result_url, f"✨ Стиль: {label}")
+    except Exception as e:
+        logger.error(f"Style failed for user {user_id}: {e}")
+        await status_msg.edit_text(
+            "❌ Ошибка генерации. Повторите попытку через 1-5 минут.",
+            reply_markup=BACK_BTN,
+        )
+        try:
+            user = update.effective_user
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=(
+                    f"🚨 Ошибка стиля\n\n"
+                    f"👤 {user.full_name} (@{user.username}, id={user_id})\n"
+                    f"🎨 Стиль: {label}\n\n"
+                    f"❗️ {str(e)}"
+                ),
             )
         except Exception:
             pass

@@ -139,6 +139,46 @@ async def tryon_in_scene(
     return await asyncio.to_thread(_run)
 
 
+STYLE_PROMPTS = {
+    "anime": (
+        "anime style portrait illustration, Studio Ghibli inspired art, "
+        "beautiful detailed anime character, soft watercolor colors, "
+        "cinematic anime scene, high quality anime art"
+    ),
+    "gta": (
+        "GTA V loading screen art style, Rockstar Games character portrait, "
+        "urban street background, gritty digital illustration, "
+        "dramatic cinematic lighting, detailed game art"
+    ),
+}
+
+
+async def apply_style(person_path: str, style: str) -> str:
+    """Apply art style to person photo using face-to-full-portrait + face-swap."""
+    style_prompt = STYLE_PROMPTS[style]
+
+    def _run():
+        person_url = _upload(person_path)
+        result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+            "image_urls": [person_url],
+            "prompt": style_prompt,
+            "image_size": "portrait_4_3",
+            "guidance_scale": 7.0,
+            "num_inference_steps": 50,
+            "num_images": 1,
+            "lora_scale": 0.9,
+            "output_format": "jpeg",
+        })
+        style_url = result["images"][0]["url"]
+        final = _subscribe("fal-ai/face-swap", {
+            "base_image_url": style_url,
+            "swap_image_url": person_url,
+        })
+        return final["image"]["url"]
+
+    return await asyncio.to_thread(_run)
+
+
 async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     """
     Insert person into described scene.
