@@ -159,10 +159,10 @@ async def apply_style(person_path: str, style: str) -> str:
         person_url = _upload(person_path)
 
         if style == "anime":
-            # Step 1: place person in epic scene
+            # Step 1: place person in epic scene (model picks location)
             scene = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
                 "image_urls": [person_url],
-                "prompt": "in Tokyo at night, Shibuya crossing, neon lights, cinematic lighting, photorealistic",
+                "prompt": "in a dramatic cinematic location, photorealistic, stunning background, cinematic lighting",
                 "image_size": "portrait_4_3",
                 "guidance_scale": 6.0,
                 "num_inference_steps": 50,
