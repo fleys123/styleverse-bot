@@ -28,29 +28,35 @@ def _upload(path: str) -> str:
 def _get_outfit(photo_path: str, scene_prompt: str) -> str:
     with open(photo_path, "rb") as f:
         image_data = base64.b64encode(f.read()).decode("utf-8")
-    msg = _get_openrouter().chat.completions.create(
-        model="google/gemini-2.0-flash-001",
-        max_tokens=60,
-        messages=[{
-            "role": "user",
-            "content": [
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
-                },
-                {
-                    "type": "text",
-                    "text": (
-                        f"This person will be placed in this scene: {scene_prompt}. "
-                        "Suggest a specific outfit that fits both their personal style and the scene. "
-                        "Reply with ONLY 3-6 words starting with 'wearing', e.g. 'wearing a casual linen shirt'. "
-                        "No explanation, no punctuation at the end."
-                    ),
-                },
-            ],
-        }],
-    )
-    return msg.choices[0].message.content.strip()
+    for attempt in range(3):
+        try:
+            msg = _get_openrouter().chat.completions.create(
+                model="google/gemini-2.0-flash-001",
+                max_tokens=60,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
+                        },
+                        {
+                            "type": "text",
+                            "text": (
+                                f"This person will be placed in this scene: {scene_prompt}. "
+                                "Suggest a specific outfit that fits both their personal style and the scene. "
+                                "Reply with ONLY 3-6 words starting with 'wearing', e.g. 'wearing a casual linen shirt'. "
+                                "No explanation, no punctuation at the end."
+                            ),
+                        },
+                    ],
+                }],
+            )
+            return msg.choices[0].message.content.strip()
+        except Exception as e:
+            if attempt == 2:
+                return "wearing casual everyday clothes"
+            time.sleep(2 ** attempt)
 
 
 def _subscribe(model: str, arguments: dict, timeout: int = 120) -> dict:
