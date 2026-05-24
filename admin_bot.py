@@ -23,17 +23,13 @@ def _main_kb() -> InlineKeyboardMarkup:
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.info(f"[ADMIN BOT] /start from user_id={update.effective_user.id}")
     if not _is_admin(update):
-        logger.info(f"[ADMIN BOT] /start rejected — not admin")
         return
     await update.message.reply_text("👑 StyleVerse Admin", reply_markup=_main_kb())
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.info(f"[ADMIN BOT] callback from user_id={update.effective_user.id}, data={update.callback_query.data if update.callback_query else None}")
     if not _is_admin(update):
-        logger.info(f"[ADMIN BOT] callback rejected — not admin")
         return
     query = update.callback_query
     await query.answer()
@@ -139,13 +135,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_callback(update, context)
 
 
-async def _admin_error_handler(update, context):
-    logger.critical(f"[ADMIN BOT] POLLING ERROR: {type(context.error).__name__}: {context.error}")
-
-
 def build_app() -> Application:
     token = (os.getenv("ADMIN_BOT_TOKEN") or "").strip()
-    logger.critical(f"[ADMIN BOT] token prefix: {repr(token[:20])}")
     if not token:
         raise ValueError("Укажи ADMIN_BOT_TOKEN в .env")
     app = (
@@ -158,5 +149,4 @@ def build_app() -> Application:
     )
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CallbackQueryHandler(handle_callback))
-    app.add_error_handler(_admin_error_handler)
     return app
