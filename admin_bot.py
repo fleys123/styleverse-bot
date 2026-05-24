@@ -140,7 +140,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def build_app() -> Application:
-    token = "".join((os.getenv("ADMIN_BOT_TOKEN") or "").split())
+    token = os.getenv("ADMIN_BOT_TOKEN")
     if not token:
         raise ValueError("Укажи ADMIN_BOT_TOKEN в .env")
     app = (
