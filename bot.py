@@ -115,9 +115,11 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         "✨ StyleVerse — перенесись куда угодно\n\n"
-        "Мальдивы • Токио • Дубай • Париж\n"
-        "Красная дорожка • Яхта • Любое место\n\n"
-        "Загрузи фото — и через 2 минуты ты уже там 🌍",
+        "🏖 Майами • 🗼 Токио • 🎬 Красная дорожка\n"
+        "🌆 Нью-Йорк • 🏙 Дубай • 🌴 Тропический остров • 🌸 Японский сад\n\n"
+        "Загрузи своё фото — нейросеть поместит тебя "
+        "в любую локацию и подберёт образ под сцену.\n\n"
+        "Результат за 1-2 минуты 🌍",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("📸 Попробовать бесплатно", callback_data="update_photo")]
         ])
