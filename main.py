@@ -42,49 +42,53 @@ async def _check_subscriptions(app):
 
 
 async def run():
+    print(">>> ENTRY run()", flush=True)
     database.init_db()
+    print(">>> DB init done", flush=True)
 
     app1 = main_bot.build_app()
-    logging.info("Main bot app built.")
+    print(">>> Main bot built", flush=True)
 
     try:
         app2 = admin_bot.build_app()
+        print(">>> Admin bot built OK", flush=True)
         logging.info("Admin bot app built.")
     except Exception as e:
+        print(f">>> Admin bot build FAILED: {e!r}", flush=True)
         logging.error(f"Admin bot build failed: {e}")
         app2 = None
 
     await app1.initialize()
-    logging.info("Main bot initialized.")
+    print(">>> Main bot initialized", flush=True)
 
     if app2:
         try:
             await app2.initialize()
-            logging.info("Admin bot initialized.")
+            print(">>> Admin bot initialized", flush=True)
         except Exception as e:
-            logging.error(f"Admin bot initialize failed: {e}")
+            print(f">>> Admin bot initialize FAILED: {e!r}", flush=True)
             app2 = None
 
     await app1.start()
-    logging.info("Main bot started.")
+    print(">>> Main bot started", flush=True)
 
     if app2:
         try:
             await app2.start()
-            logging.info("Admin bot started.")
+            print(">>> Admin bot started", flush=True)
         except Exception as e:
-            logging.error(f"Admin bot start failed: {e}")
+            print(f">>> Admin bot start FAILED: {e!r}", flush=True)
             app2 = None
 
     await app1.updater.start_polling()
-    logging.info("Main bot polling started.")
+    print(">>> Main bot polling", flush=True)
 
     if app2:
         try:
             await app2.updater.start_polling()
-            logging.info("Admin bot polling started.")
+            print(">>> Admin bot polling", flush=True)
         except Exception as e:
-            logging.error(f"Admin bot polling failed: {e}")
+            print(f">>> Admin bot polling FAILED: {e!r}", flush=True)
 
     asyncio.create_task(_check_subscriptions(app1))
     logging.info("Both bots started successfully.")
