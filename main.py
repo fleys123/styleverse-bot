@@ -1,7 +1,9 @@
 import asyncio
 import logging
+import os
 import signal
 
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,6 +19,21 @@ import admin_bot
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 ADMIN_ID = 835360588
+_ADMIN_TOKEN = (os.getenv("ADMIN_BOT_TOKEN") or "").strip()
+
+
+async def _notify_admin(text: str):
+    """Send message to admin via admin bot token (direct API, no Application state needed)."""
+    if not _ADMIN_TOKEN:
+        return
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(
+                f"https://api.telegram.org/bot{_ADMIN_TOKEN}/sendMessage",
+                json={"chat_id": ADMIN_ID, "text": text},
+            )
+    except Exception:
+        pass
 
 
 async def _check_subscriptions(app):
@@ -85,15 +102,10 @@ async def run():
             logging.error(f"Admin bot polling failed: {e}")
             admin_error = f"polling: {e}"
 
-    # Report startup result to admin via main bot
-    try:
-        if admin_error:
-            msg = f"⚠️ Admin bot не запустился\n\nОшибка: {admin_error}"
-        else:
-            msg = "✅ Оба бота запущены"
-        await app1.bot.send_message(chat_id=ADMIN_ID, text=msg)
-    except Exception:
-        pass
+    if admin_error:
+        await _notify_admin(f"⚠️ Admin bot не запустился\n\nОшибка: {admin_error}")
+    else:
+        await _notify_admin("✅ Оба бота запущены")
 
     asyncio.create_task(_check_subscriptions(app1))
     logging.info("Startup complete.")
