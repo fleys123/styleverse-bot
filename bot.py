@@ -124,11 +124,6 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Пляж в Майами, ночное Токио, Дубай на закате, красная дорожка, "
         "снежные горы — любое место за 1-2 минуты.\n\n"
         "━━━━━━━━━━━━━━━━\n"
-        "🎁 ДЛЯ НОВЫХ ПОЛЬЗОВАТЕЛЕЙ:\n"
-        "━━━━━━━━━━━━━━━━\n\n"
-        "3 бесплатные генерации в подарок!\n"
-        "Далее — подписка 50 генераций за 400 ₽/месяц.\n\n"
-        "━━━━━━━━━━━━━━━━\n"
         "📌 КАК НАЧАТЬ:\n"
         "━━━━━━━━━━━━━━━━\n\n"
         "1️⃣ Загрузите своё фото (лучше портрет, хорошее освещение)\n"
@@ -438,14 +433,6 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
         await status_msg.edit_text(
             "Фото не найдено. Пожалуйста, загрузите своё фото заново:",
             reply_markup=main_menu_keyboard(False),
-        )
-        return
-
-    can_gen, reason = database.check_generation_access(user_id)
-    if not can_gen:
-        await status_msg.edit_text(
-            _limit_message(reason),
-            reply_markup=_limit_keyboard(reason),
         )
         return
 
