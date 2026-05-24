@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import signal
-import sys
 
 from dotenv import load_dotenv
 
@@ -12,16 +11,12 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-sys.stderr.write("=== MAIN.PY MODULE LOADED ===\n")
-sys.stderr.flush()
-
 import database
 import bot as main_bot
 import admin_bot
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
-sys.stderr.write("=== ALL IMPORTS DONE ===\n")
-sys.stderr.flush()
+ADMIN_ID = 835360588
 
 
 async def _check_subscriptions(app):
@@ -49,54 +44,59 @@ async def _check_subscriptions(app):
 
 
 async def run():
-    sys.stderr.write("=== run() STARTED ===\n"); sys.stderr.flush()
     database.init_db()
 
     app1 = main_bot.build_app()
-    sys.stderr.write("=== main bot built ===\n"); sys.stderr.flush()
 
+    admin_error = None
     try:
         app2 = admin_bot.build_app()
-        sys.stderr.write("=== admin bot built OK ===\n"); sys.stderr.flush()
     except Exception as e:
-        sys.stderr.write(f"=== admin bot build FAILED: {e!r} ===\n"); sys.stderr.flush()
         logging.error(f"Admin bot build failed: {e}")
+        admin_error = f"build: {e}"
         app2 = None
 
     await app1.initialize()
-    sys.stderr.write("=== main bot initialized ===\n"); sys.stderr.flush()
 
     if app2:
         try:
             await app2.initialize()
-            sys.stderr.write("=== admin bot initialized ===\n"); sys.stderr.flush()
         except Exception as e:
-            sys.stderr.write(f"=== admin bot initialize FAILED: {e!r} ===\n"); sys.stderr.flush()
+            logging.error(f"Admin bot initialize failed: {e}")
+            admin_error = f"initialize: {e}"
             app2 = None
 
     await app1.start()
-    sys.stderr.write("=== main bot started ===\n"); sys.stderr.flush()
 
     if app2:
         try:
             await app2.start()
-            sys.stderr.write("=== admin bot started ===\n"); sys.stderr.flush()
         except Exception as e:
-            sys.stderr.write(f"=== admin bot start FAILED: {e!r} ===\n"); sys.stderr.flush()
+            logging.error(f"Admin bot start failed: {e}")
+            admin_error = f"start: {e}"
             app2 = None
 
     await app1.updater.start_polling()
-    sys.stderr.write("=== main bot polling ===\n"); sys.stderr.flush()
 
     if app2:
         try:
             await app2.updater.start_polling()
-            sys.stderr.write("=== admin bot polling ===\n"); sys.stderr.flush()
         except Exception as e:
-            sys.stderr.write(f"=== admin bot polling FAILED: {e!r} ===\n"); sys.stderr.flush()
+            logging.error(f"Admin bot polling failed: {e}")
+            admin_error = f"polling: {e}"
+
+    # Report startup result to admin via main bot
+    try:
+        if admin_error:
+            msg = f"⚠️ Admin bot не запустился\n\nОшибка: {admin_error}"
+        else:
+            msg = "✅ Оба бота запущены"
+        await app1.bot.send_message(chat_id=ADMIN_ID, text=msg)
+    except Exception:
+        pass
 
     asyncio.create_task(_check_subscriptions(app1))
-    logging.info("Both bots started successfully.")
+    logging.info("Startup complete.")
 
     stop_event = asyncio.Event()
     loop = asyncio.get_event_loop()
