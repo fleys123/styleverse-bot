@@ -54,7 +54,13 @@ async def run():
     await app2.start()
 
     await app1.updater.start_polling()
-    await app2.updater.start_polling()
+    logging.info("Main bot polling started.")
+
+    try:
+        await app2.updater.start_polling()
+        logging.info("Admin bot polling started.")
+    except Exception as e:
+        logging.error(f"Admin bot failed to start polling: {e}")
 
     asyncio.create_task(_check_subscriptions(app1))
     logging.info("Both bots started successfully.")
