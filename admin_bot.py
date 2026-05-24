@@ -139,8 +139,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_callback(update, context)
 
 
+async def _admin_error_handler(update, context):
+    logger.critical(f"[ADMIN BOT] POLLING ERROR: {type(context.error).__name__}: {context.error}")
+
+
 def build_app() -> Application:
     token = (os.getenv("ADMIN_BOT_TOKEN") or "").strip()
+    logger.critical(f"[ADMIN BOT] token prefix: {repr(token[:20])}")
     if not token:
         raise ValueError("Укажи ADMIN_BOT_TOKEN в .env")
     app = (
@@ -153,4 +158,5 @@ def build_app() -> Application:
     )
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CallbackQueryHandler(handle_callback))
+    app.add_error_handler(_admin_error_handler)
     return app
