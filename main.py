@@ -19,7 +19,7 @@ import admin_bot
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 
 ADMIN_ID = 835360588
-_ADMIN_TOKEN = (os.getenv("ADMIN_BOT_TOKEN") or "").strip()
+_ADMIN_TOKEN = "".join((os.getenv("ADMIN_BOT_TOKEN") or "").split())
 
 
 async def _notify_admin(text: str):
