@@ -118,8 +118,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("adm_setvip_"):
         uid = int(data.split("_")[2])
-        database.set_status(uid, "vip")
-        await query.answer("🎁 VIP выдан!", show_alert=True)
+        until = database.activate_subscription(uid, days=30)
+        until_str = until[:10]
+        await query.answer(f"🎁 Подписка выдана до {until_str}!", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
 

@@ -124,13 +124,18 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Пляж в Майами, ночное Токио, Дубай на закате, красная дорожка, "
         "снежные горы — любое место за 1-2 минуты.\n\n"
         "━━━━━━━━━━━━━━━━\n"
+        "🎁 ДЛЯ НОВЫХ ПОЛЬЗОВАТЕЛЕЙ:\n"
+        "━━━━━━━━━━━━━━━━\n\n"
+        "3 бесплатные генерации в подарок!\n"
+        "Далее — подписка 50 генераций за 299 ₽/месяц.\n\n"
+        "━━━━━━━━━━━━━━━━\n"
         "📌 КАК НАЧАТЬ:\n"
         "━━━━━━━━━━━━━━━━\n\n"
-        "1️⃣ Загрузи своё фото (лучше портрет, хорошее освещение)\n"
-        "2️⃣ Выбери локацию из списка или напиши своё описание\n"
-        "3️⃣ Жди результат ~1-2 минуты\n\n"
+        "1️⃣ Загрузите своё фото (лучше портрет, хорошее освещение)\n"
+        "2️⃣ Выберите локацию из списка или напишите своё описание\n"
+        "3️⃣ Ждите результат ~1-2 минуты\n\n"
         "💡 Чем чётче фото лица — тем лучше результат.\n\n"
-        "⬇️ Нажми кнопку ниже чтобы начать:",
+        "⬇️ Нажмите кнопку ниже чтобы начать:",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("📸 Загрузить своё фото", callback_data="update_photo")]
         ])
@@ -361,6 +366,37 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ADMIN_ID = 835360588
 
+SUB_PRICE = "299 ₽"
+SUB_LINK = "https://t.me/Fleys2"
+
+
+def _limit_message(reason: str) -> str:
+    if reason == "free_limit":
+        return (
+            "✨ Вы использовали все 3 бесплатные генерации!\n\n"
+            "Оформите подписку — 50 генераций в месяц всего за 299 ₽.\n\n"
+            "Напишите нам, и мы поможем с оплатой 👇"
+        )
+    if reason == "sub_limit":
+        return (
+            "Вы использовали все 50 генераций за этот месяц.\n\n"
+            "Подписка автоматически обновится в следующем месяце. "
+            "Если хотите продлить раньше — напишите нам 👇"
+        )
+    if reason == "sub_expired":
+        return (
+            "Срок вашей подписки истёк.\n\n"
+            "Оформите новую — 50 генераций в месяц за 299 ₽ 👇"
+        )
+    return "Генерация недоступна. Напишите в поддержку."
+
+
+def _limit_keyboard(reason: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("💳 Оформить подписку", url=SUB_LINK)],
+        [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
+    ])
+
 
 async def _start_training(update, context, photo_paths: list, status_msg):
     user_id = update.effective_user.id
@@ -404,6 +440,15 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
             reply_markup=main_menu_keyboard(False),
         )
         return
+
+    can_gen, reason = database.check_generation_access(user_id)
+    if not can_gen:
+        await status_msg.edit_text(
+            _limit_message(reason),
+            reply_markup=_limit_keyboard(reason),
+        )
+        return
+
     try:
         result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         database.increment_generation(user_id)

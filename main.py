@@ -14,6 +14,31 @@ logging.basicConfig(
 import database
 import bot as main_bot
 import admin_bot
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+
+
+async def _check_subscriptions(app):
+    """Hourly job: notify expiring subs, revoke expired ones."""
+    while True:
+        await asyncio.sleep(3600)
+        try:
+            expiring = database.get_expiring_subscriptions()
+            for user_id, until in expiring:
+                try:
+                    await app.bot.send_message(
+                        chat_id=user_id,
+                        text=(
+                            f"⏳ Напоминаем: ваша подписка StyleVerse истекает {until[:10]}.\n\n"
+                            "Чтобы продолжить пользоваться ботом — продлите подписку 👇"
+                        ),
+                        reply_markup=InlineKeyboardMarkup([[
+                            InlineKeyboardButton("💳 Продлить подписку", url="https://t.me/Fleys2")
+                        ]]),
+                    )
+                except Exception:
+                    pass
+        except Exception as e:
+            logging.error(f"Subscription check error: {e}")
 
 
 async def run():
@@ -31,6 +56,7 @@ async def run():
     await app1.updater.start_polling()
     await app2.updater.start_polling()
 
+    asyncio.create_task(_check_subscriptions(app1))
     logging.info("Both bots started successfully.")
 
     stop_event = asyncio.Event()
