@@ -25,6 +25,12 @@ async def run():
     await app1.initialize()
     await app2.initialize()
 
+    me1 = await app1.bot.get_me()
+    logging.info(f"Main bot OK: @{me1.username}")
+
+    me2 = await app2.bot.get_me()
+    logging.info(f"Admin bot OK: @{me2.username}")
+
     await app1.start()
     await app2.start()
 
