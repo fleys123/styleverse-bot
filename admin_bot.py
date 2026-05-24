@@ -90,7 +90,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("Пользователь не найден.")
             return
 
-        uid, username, full_name, joined, gens, status = user
+        uid, username, full_name, joined, gens, status, subscription_until, sub_gens_used = user
         status_str = "🎁 VIP" if status == "vip" else "🚫 Заблокирован" if status == "banned" else "✅ Активен"
         name = f"@{username}" if username else full_name or str(uid)
 
@@ -98,9 +98,12 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👤 {name}\n"
             f"🆔 ID: `{uid}`\n"
             f"📅 Дата: {joined[:10]}\n"
-            f"🎨 Генераций: {gens}\n"
+            f"🎨 Генераций всего: {gens}\n"
             f"📌 Статус: {status_str}"
         )
+        if status == "vip" and subscription_until:
+            text += f"\n📆 Подписка до: {subscription_until[:10]}"
+            text += f"\n⚡️ Использовано в месяц: {sub_gens_used} / {database.SUB_LIMIT}"
 
         buttons = []
         if status != "vip":
