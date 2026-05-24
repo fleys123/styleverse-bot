@@ -23,13 +23,17 @@ def _main_kb() -> InlineKeyboardMarkup:
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"[ADMIN BOT] /start from user_id={update.effective_user.id}")
     if not _is_admin(update):
+        logger.info(f"[ADMIN BOT] /start rejected — not admin")
         return
     await update.message.reply_text("👑 StyleVerse Admin", reply_markup=_main_kb())
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"[ADMIN BOT] callback from user_id={update.effective_user.id}, data={update.callback_query.data if update.callback_query else None}")
     if not _is_admin(update):
+        logger.info(f"[ADMIN BOT] callback rejected — not admin")
         return
     query = update.callback_query
     await query.answer()
