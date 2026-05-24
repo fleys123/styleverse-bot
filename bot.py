@@ -127,7 +127,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🎁 ДЛЯ НОВЫХ ПОЛЬЗОВАТЕЛЕЙ:\n"
         "━━━━━━━━━━━━━━━━\n\n"
         "3 бесплатные генерации в подарок!\n"
-        "Далее — подписка 50 генераций за 299 ₽/месяц.\n\n"
+        "Далее — подписка 50 генераций за 400 ₽/месяц.\n\n"
         "━━━━━━━━━━━━━━━━\n"
         "📌 КАК НАЧАТЬ:\n"
         "━━━━━━━━━━━━━━━━\n\n"
@@ -366,7 +366,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ADMIN_ID = 835360588
 
-SUB_PRICE = "299 ₽"
+SUB_PRICE = "400 ₽"
 SUB_LINK = "https://t.me/Fleys2"
 
 
@@ -374,7 +374,7 @@ def _limit_message(reason: str) -> str:
     if reason == "free_limit":
         return (
             "✨ Вы использовали все 3 бесплатные генерации!\n\n"
-            "Оформите подписку — 50 генераций в месяц всего за 299 ₽.\n\n"
+            "Оформите подписку — 50 генераций в месяц всего за 400 ₽.\n\n"
             "Напишите нам, и мы поможем с оплатой 👇"
         )
     if reason == "sub_limit":
@@ -386,7 +386,7 @@ def _limit_message(reason: str) -> str:
     if reason == "sub_expired":
         return (
             "Срок вашей подписки истёк.\n\n"
-            "Оформите новую — 50 генераций в месяц за 299 ₽ 👇"
+            "Оформите новую — 50 генераций в месяц за 400 ₽ 👇"
         )
     return "Генерация недоступна. Напишите в поддержку."
 
