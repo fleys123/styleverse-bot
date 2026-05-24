@@ -91,7 +91,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         uid, username, full_name, joined, gens, status, sub_until, sub_gens = user
-        status_str = "🎁 VIP" if status == "vip" else "🚫 Заблокирован" if status == "banned" else "✅ Активен"
+        if status == "vip" and not sub_until:
+            status_str = "👑 VIP (безлимит)"
+        elif status == "vip" and sub_until:
+            status_str = f"🎁 Подписка до {sub_until[:10]}"
+        elif status == "banned":
+            status_str = "🚫 Заблокирован"
+        else:
+            status_str = "✅ Активен"
         name = f"@{username}" if username else full_name or str(uid)
 
         text = (
@@ -102,10 +109,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📌 Статус: {status_str}"
         )
         if status == "vip" and sub_until:
-            text += f"\n⏳ Подписка до: {sub_until[:10]} ({sub_gens}/50 исп.)"
+            text += f"\n📊 Использовано: {sub_gens}/50"
 
         buttons = []
-        buttons.append([InlineKeyboardButton("🎁 Выдать подписку 30д", callback_data=f"adm_sub_{uid}")])
+        buttons.append([InlineKeyboardButton("🎁 Подписка 30д", callback_data=f"adm_sub_{uid}")])
+        buttons.append([InlineKeyboardButton("👑 VIP (безлимит)", callback_data=f"adm_vip_{uid}")])
         if status != "banned":
             buttons.append([InlineKeyboardButton("🚫 Заблокировать", callback_data=f"adm_ban_{uid}")])
         if status in ("banned", "vip"):
@@ -118,6 +126,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         uid = int(data.split("_")[2])
         until = database.activate_subscription(uid, days=30)
         await query.answer(f"🎁 Подписка выдана до {until[:10]}!", show_alert=True)
+        query.data = f"adm_user_{uid}"
+        await handle_callback(update, context)
+
+    elif data.startswith("adm_vip_"):
+        uid = int(data.split("_")[2])
+        database.set_vip(uid)
+        await query.answer("👑 VIP выдан (безлимит)!", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
 

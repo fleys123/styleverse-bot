@@ -73,7 +73,21 @@ def get_users(limit: int = 10, offset: int = 0) -> list[tuple]:
 
 def set_status(user_id: int, status: str):
     with _conn() as db:
-        db.execute("UPDATE users SET status = ? WHERE user_id = ?", (status, user_id))
+        if status == "active":
+            db.execute(
+                "UPDATE users SET status = ?, subscription_until = NULL, sub_gens_used = 0 WHERE user_id = ?",
+                (status, user_id),
+            )
+        else:
+            db.execute("UPDATE users SET status = ? WHERE user_id = ?", (status, user_id))
+
+
+def set_vip(user_id: int):
+    with _conn() as db:
+        db.execute(
+            "UPDATE users SET status = 'vip', subscription_until = NULL WHERE user_id = ?",
+            (user_id,),
+        )
 
 
 def activate_subscription(user_id: int, days: int = 30) -> str:
@@ -112,7 +126,9 @@ def check_generation_access(user_id: int) -> tuple[bool, str]:
     if status == "banned":
         return False, "banned"
 
-    if status == "vip" and subscription_until:
+    if status == "vip":
+        if not subscription_until:
+            return True, "ok"  # безлимитный VIP
         until = datetime.strptime(subscription_until, "%Y-%m-%d %H:%M:%S")
         if datetime.utcnow() > until:
             with _conn() as db:
