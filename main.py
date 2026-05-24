@@ -45,22 +45,46 @@ async def run():
     database.init_db()
 
     app1 = main_bot.build_app()
-    app2 = admin_bot.build_app()
+    logging.info("Main bot app built.")
+
+    try:
+        app2 = admin_bot.build_app()
+        logging.info("Admin bot app built.")
+    except Exception as e:
+        logging.error(f"Admin bot build failed: {e}")
+        app2 = None
 
     await app1.initialize()
-    await app2.initialize()
+    logging.info("Main bot initialized.")
+
+    if app2:
+        try:
+            await app2.initialize()
+            logging.info("Admin bot initialized.")
+        except Exception as e:
+            logging.error(f"Admin bot initialize failed: {e}")
+            app2 = None
 
     await app1.start()
-    await app2.start()
+    logging.info("Main bot started.")
+
+    if app2:
+        try:
+            await app2.start()
+            logging.info("Admin bot started.")
+        except Exception as e:
+            logging.error(f"Admin bot start failed: {e}")
+            app2 = None
 
     await app1.updater.start_polling()
     logging.info("Main bot polling started.")
 
-    try:
-        await app2.updater.start_polling()
-        logging.info("Admin bot polling started.")
-    except Exception as e:
-        logging.error(f"Admin bot failed to start polling: {e}")
+    if app2:
+        try:
+            await app2.updater.start_polling()
+            logging.info("Admin bot polling started.")
+        except Exception as e:
+            logging.error(f"Admin bot polling failed: {e}")
 
     asyncio.create_task(_check_subscriptions(app1))
     logging.info("Both bots started successfully.")
@@ -73,11 +97,14 @@ async def run():
     await stop_event.wait()
 
     await app1.updater.stop()
-    await app2.updater.stop()
+    if app2:
+        await app2.updater.stop()
     await app1.stop()
-    await app2.stop()
+    if app2:
+        await app2.stop()
     await app1.shutdown()
-    await app2.shutdown()
+    if app2:
+        await app2.shutdown()
 
 
 if __name__ == "__main__":
