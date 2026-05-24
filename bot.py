@@ -416,8 +416,14 @@ async def _start_training(update, context, photo_paths: list, status_msg):
 
 async def _generate_scene(update, context, scene_prompt: str, status_msg):
     user_id = update.effective_user.id
-    person_path = storage.get_profile_photo_path(user_id)
     chat_id = update.effective_chat.id
+
+    can_gen, reason = database.check_generation_access(user_id)
+    if not can_gen:
+        await status_msg.edit_text(_limit_message(reason), reply_markup=_limit_keyboard(reason))
+        return
+
+    person_path = storage.get_profile_photo_path(user_id)
     if not person_path:
         await status_msg.edit_text(
             "Фото не найдено. Пожалуйста, загрузите своё фото заново:",

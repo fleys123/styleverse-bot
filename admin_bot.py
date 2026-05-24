@@ -90,7 +90,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("Пользователь не найден.")
             return
 
-        uid, username, full_name, joined, gens, status = user
+        uid, username, full_name, joined, gens, status, sub_until, sub_gens = user
         status_str = "🎁 VIP" if status == "vip" else "🚫 Заблокирован" if status == "banned" else "✅ Активен"
         name = f"@{username}" if username else full_name or str(uid)
 
@@ -101,10 +101,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🎨 Генераций: {gens}\n"
             f"📌 Статус: {status_str}"
         )
+        if status == "vip" and sub_until:
+            text += f"\n⏳ Подписка до: {sub_until[:10]} ({sub_gens}/50 исп.)"
 
         buttons = []
-        if status != "vip":
-            buttons.append([InlineKeyboardButton("🎁 Выдать VIP", callback_data=f"adm_setvip_{uid}")])
+        buttons.append([InlineKeyboardButton("🎁 Выдать подписку 30д", callback_data=f"adm_sub_{uid}")])
         if status != "banned":
             buttons.append([InlineKeyboardButton("🚫 Заблокировать", callback_data=f"adm_ban_{uid}")])
         if status in ("banned", "vip"):
@@ -113,10 +114,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(buttons), parse_mode="Markdown")
 
-    elif data.startswith("adm_setvip_"):
+    elif data.startswith("adm_sub_"):
         uid = int(data.split("_")[2])
-        database.set_status(uid, "vip")
-        await query.answer("🎁 VIP выдан!", show_alert=True)
+        until = database.activate_subscription(uid, days=30)
+        await query.answer(f"🎁 Подписка выдана до {until[:10]}!", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
 
