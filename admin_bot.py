@@ -125,13 +125,38 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("adm_sub_"):
         uid = int(data.split("_")[2])
         until = database.activate_subscription(uid, days=30)
-        await query.answer(f"🎁 Подписка выдана до {until[:10]}!", show_alert=True)
+        until_fmt = until[:10].replace("-", ".")
+        try:
+            await context.bot.send_message(
+                chat_id=uid,
+                text=(
+                    f"🎁 Вам активирована подписка StyleVerse!\n\n"
+                    f"✅ 50 генераций на 30 дней\n"
+                    f"📅 Действует до: {until_fmt}\n\n"
+                    f"/start"
+                ),
+            )
+        except Exception:
+            pass
+        await query.answer(f"🎁 Подписка выдана до {until_fmt}!", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
 
     elif data.startswith("adm_vip_"):
         uid = int(data.split("_")[2])
         database.set_vip(uid)
+        try:
+            await context.bot.send_message(
+                chat_id=uid,
+                text=(
+                    "👑 Вам выдан VIP-статус StyleVerse!\n\n"
+                    "✅ Безлимитные генерации\n"
+                    "🚀 Без ограничений по времени\n\n"
+                    "/start"
+                ),
+            )
+        except Exception:
+            pass
         await query.answer("👑 VIP выдан (безлимит)!", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
