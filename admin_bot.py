@@ -1,10 +1,14 @@
 import logging
 import os
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 import database
+
+
+def _main_bot() -> Bot:
+    return Bot(token=(os.getenv("TELEGRAM_BOT_TOKEN") or "").strip())
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +131,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         until = database.activate_subscription(uid, days=30)
         until_fmt = until[:10].replace("-", ".")
         try:
-            await context.bot.send_message(
+            await _main_bot().send_message(
                 chat_id=uid,
                 text=(
                     f"🎁 Вам активирована подписка StyleVerse!\n\n"
@@ -146,7 +150,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         uid = int(data.split("_")[2])
         database.set_vip(uid)
         try:
-            await context.bot.send_message(
+            await _main_bot().send_message(
                 chat_id=uid,
                 text=(
                     "👑 Вам выдан VIP-статус StyleVerse!\n\n"
