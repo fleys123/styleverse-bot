@@ -107,7 +107,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         text = (
             f"👤 {name}\n"
-            f"🆔 ID: `{uid}`\n"
+            f"🆔 ID: <code>{uid}</code>\n"
             f"📅 Дата: {joined[:10]}\n"
             f"🎨 Генераций: {gens}\n"
             f"📌 Статус: {status_str}"
@@ -124,7 +124,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             buttons.append([InlineKeyboardButton("✅ Сбросить", callback_data=f"adm_reset_{uid}")])
         buttons.append([InlineKeyboardButton("🔙 Список", callback_data="adm_users_0")])
 
-        await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(buttons), parse_mode="Markdown")
+        await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(buttons), parse_mode="HTML")
 
     elif data.startswith("adm_sub_"):
         uid = int(data.split("_")[2])
