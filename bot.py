@@ -448,10 +448,18 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
         await _send_result(chat_id, context, person_path, result_url, f"✨ Ты в сцене: {scene_prompt}")
     except Exception as e:
         logger.error(f"Scene failed for user {user_id}: {e}")
-        await status_msg.edit_text(
-            "❌ Ошибка генерации. Повторите попытку через 1-5 минут.",
-            reply_markup=BACK_BTN,
-        )
+        err_lower = str(e).lower()
+        if "face" in err_lower or "no face" in err_lower or "detect" in err_lower:
+            user_msg = (
+                "😔 Не удалось распознать лицо на твоём фото.\n\n"
+                "Попробуй загрузить другое фото:\n"
+                "• Лицо чёткое и хорошо освещено\n"
+                "• Занимает бо́льшую часть кадра\n"
+                "• Без очков, маски или капюшона"
+            )
+        else:
+            user_msg = "❌ Ошибка генерации. Повторите попытку через 1-5 минут."
+        await status_msg.edit_text(user_msg, reply_markup=BACK_BTN)
         try:
             user = update.effective_user
             await context.bot.send_message(
