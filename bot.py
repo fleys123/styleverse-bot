@@ -30,6 +30,7 @@ STATE_IDLE = "idle"
 STATE_WAITING_PROFILE = "waiting_profile"
 STATE_WAITING_SCENE = "waiting_scene"
 STATE_TRAINING_COLLECTING = "training_collecting"
+STATE_WAITING_REVIEW = "waiting_review"
 
 MIN_TRAINING_PHOTOS = 5
 MAX_TRAINING_PHOTOS = 15
@@ -172,16 +173,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not result_url:
             await query.answer("Нет результата для публикации.", show_alert=True)
             return
-        try:
-            await context.bot.send_photo(
-                chat_id=CHANNEL,
-                photo=result_url,
-                caption="✨ Создано в StyleVerse\n\n👉 Попробуй сам: @styleverse_bot",
-            )
-            await query.answer("✅ Опубликовано в канале!", show_alert=True)
-        except Exception as e:
-            logger.error(f"Channel post failed: {e}")
-            await query.answer("Ошибка публикации.", show_alert=True)
+        context.user_data["state"] = STATE_WAITING_REVIEW
+        await query.edit_message_text(
+            "✍️ Напиши свой отзыв — мы опубликуем его вместе с фото в канале.\n\n"
+            "Например: «Результат просто огонь, я в восторге!»"
+        )
 
     elif query.data == "update_photo":
         context.user_data["state"] = STATE_WAITING_PROFILE
@@ -354,6 +350,32 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         context.user_data["state"] = STATE_IDLE
         await _generate_scene(update, context, scene_prompt, status_msg)
+    elif state == STATE_WAITING_REVIEW:
+        review = update.message.text.strip()
+        result_url = context.user_data.get("last_result_url")
+        context.user_data["state"] = STATE_IDLE
+        if not result_url:
+            await update.message.reply_text(
+                "Фото не найдено, попробуй сгенерировать заново.",
+                reply_markup=main_menu_keyboard(storage.has_profile_photo(update.effective_user.id)),
+            )
+            return
+        try:
+            await context.bot.send_photo(
+                chat_id=CHANNEL,
+                photo=result_url,
+                caption=f"✨ {review}\n\n👉 @styleverse_bot",
+            )
+            await update.message.reply_text(
+                "✅ Опубликовано в канале, спасибо!",
+                reply_markup=main_menu_keyboard(True),
+            )
+        except Exception as e:
+            logger.error(f"Channel post failed: {e}")
+            await update.message.reply_text(
+                "Ошибка публикации, попробуй позже.",
+                reply_markup=main_menu_keyboard(True),
+            )
     else:
         await update.message.reply_text("Используй /start чтобы начать.")
 
