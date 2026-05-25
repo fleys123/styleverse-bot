@@ -25,14 +25,15 @@ def _upload(path: str) -> str:
             time.sleep(2 ** attempt)
 
 
-def _get_outfit(photo_path: str, scene_prompt: str) -> str:
+def _get_style_description(photo_path: str, scene_prompt: str) -> str:
+    """Returns body type + outfit description for use in generation prompt."""
     with open(photo_path, "rb") as f:
         image_data = base64.b64encode(f.read()).decode("utf-8")
     for attempt in range(3):
         try:
             msg = _get_openrouter().chat.completions.create(
                 model="google/gemini-2.0-flash-001",
-                max_tokens=60,
+                max_tokens=80,
                 messages=[{
                     "role": "user",
                     "content": [
@@ -44,8 +45,10 @@ def _get_outfit(photo_path: str, scene_prompt: str) -> str:
                             "type": "text",
                             "text": (
                                 f"This person will be placed in this scene: {scene_prompt}. "
-                                "Suggest a specific outfit that fits both their personal style and the scene. "
-                                "Reply with ONLY 3-6 words starting with 'wearing', e.g. 'wearing a casual linen shirt'. "
+                                "Describe two things in one short phrase: "
+                                "1) their exact body build (e.g. slim, slender, athletic, curvy) "
+                                "2) a fitting outfit for the scene. "
+                                "Reply with ONLY 5-9 words, e.g. 'slim slender build, wearing a white sundress'. "
                                 "No explanation, no punctuation at the end."
                             ),
                         },
@@ -55,7 +58,7 @@ def _get_outfit(photo_path: str, scene_prompt: str) -> str:
             return msg.choices[0].message.content.strip()
         except Exception as e:
             if attempt == 2:
-                return "wearing casual everyday clothes"
+                return "slim build, wearing casual everyday clothes"
             time.sleep(2 ** attempt)
 
 
@@ -154,12 +157,12 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     """
     def _run():
         person_url = _upload(person_path)
-        outfit = _get_outfit(person_path, scene_prompt)
+        style = _get_style_description(person_path, scene_prompt)
 
         # Step 1: face-to-full-portrait — portrait shot in scene with reference photo
         scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
             "image_urls": [person_url],
-            "prompt": f"{scene_prompt}, {outfit}, same body type and figure as reference, same body proportions, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
+            "prompt": f"{scene_prompt}, {style}, strictly preserve exact body proportions from reference, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
             "image_size": "portrait_4_3",
             "guidance_scale": 6.0,
             "num_inference_steps": 50,
