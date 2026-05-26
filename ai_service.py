@@ -114,7 +114,7 @@ async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
         person_url = _upload(person_path)
         result = _subscribe("fal-ai/nano-banana-pro/edit", {
             "image_urls": [person_url],
-            "prompt": f"Place this person in this scene: {scene_prompt}. Keep their face, hair, and outfit exactly the same.",
+            "prompt": f"Place this person in this scene: {scene_prompt}. Keep their face and hair exactly the same. Dress them in a stylish outfit that fits the location perfectly.",
             "output_format": "jpeg",
         })
         return result["images"][0]["url"]
