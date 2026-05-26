@@ -45,13 +45,16 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("🏖 Пляж Майами",       "on Miami beach at sunset"),
-    ("🗼 Токио ночью",        "in Tokyo at night, Shibuya crossing"),
-    ("🎬 Красная дорожка",    "on a red carpet event"),
-    ("🌆 Нью-Йорк",          "on a Manhattan street in New York City"),
-    ("🏙 Дубай",             "in Dubai with skyline view"),
-    ("🌴 Тропический остров", "on a tropical island beach"),
-    ("🌸 Японский сад",       "in a Japanese cherry blossom garden"),
+    ("☕️ Кафе в Париже",       "sitting at a cozy Parisian cafe terrace with a coffee cup, golden morning light"),
+    ("🗼 Эйфелева башня",      "standing near the Eiffel Tower in Paris, sunny day, tourist photo"),
+    ("🌊 Санторини",           "on a white terrace in Santorini Greece, blue domes view, bright summer sun"),
+    ("🛍 Шопинг в Милане",     "walking on a luxury shopping street in Milan, boutique windows, elegant atmosphere"),
+    ("🌅 Закат на Бали",       "sitting on a swing over rice fields in Bali at sunset, tropical vibes"),
+    ("🎡 Монмартр",            "on a cobblestone street in Montmartre Paris, flowers and cafes around"),
+    ("🏖 Пляж Майорки",        "on a beautiful beach in Mallorca, turquoise water, white sand, summer"),
+    ("🌸 Цветущая сакура",     "standing under blooming cherry blossom trees in Japan, pink petals falling"),
+    ("🛥 Яхта в Монако",       "on a luxury yacht in Monaco harbour, glamorous summer look"),
+    ("🏙 Манхэттен",           "on a rooftop in Manhattan New York City, skyline view at golden hour"),
 ]
 
 
@@ -115,12 +118,12 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     await update.message.reply_text(
-        "✨ StyleVerse — перенесись куда угодно\n\n"
-        "🏖 Майами • 🗼 Токио • 🎬 Красная дорожка\n"
-        "🌆 Нью-Йорк • 🏙 Дубай • 🌴 Тропический остров • 🌸 Японский сад\n\n"
+        "✨ StyleVerse — окажись в любой точке мира\n\n"
+        "☕️ Кафе в Париже • 🗼 Эйфелева башня • 🌊 Санторини\n"
+        "🛍 Милан • 🌅 Бали • 🎡 Монмартр • 🏖 Майорка\n\n"
         "Загрузи своё фото — нейросеть поместит тебя "
-        "в любую локацию и подберёт образ под сцену.\n\n"
-        "Результат за 1-2 минуты 🌍",
+        "в любое место мечты.\n\n"
+        "Результат за 30 секунд 🌍",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("📸 Попробовать бесплатно", callback_data="update_photo")]
         ])
@@ -144,7 +147,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "💡 СОВЕТЫ:\n"
         "━━━━━━━━━━━━━━━━\n\n"
         "• Фото лица должно быть чётким — это главное для качества\n"
-        "• Описывай сцену детально: не просто 'пляж', а 'пляж в Майами на закате'\n"
+        "• Описывай сцену детально: не просто 'пляж', а 'пляж на Майорке с бирюзовой водой'\n"
         "• Если результат не понравился — попробуй ещё раз, каждый раз разный\n\n"
         "/start — главное меню\n"
         "/help — эта справка"
