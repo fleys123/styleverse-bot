@@ -1,18 +1,10 @@
 import asyncio
-import base64
 import os
 import tempfile
 import time
 import zipfile
 
 import fal_client
-from openai import OpenAI
-
-def _get_openrouter() -> OpenAI:
-    return OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.environ["OPENROUTER_API_KEY"],
-    )
 
 
 def _upload(path: str) -> str:
@@ -24,42 +16,6 @@ def _upload(path: str) -> str:
                 raise
             time.sleep(2 ** attempt)
 
-
-def _get_style_description(photo_path: str, scene_prompt: str) -> str:
-    """Returns body type + outfit description for use in generation prompt."""
-    with open(photo_path, "rb") as f:
-        image_data = base64.b64encode(f.read()).decode("utf-8")
-    for attempt in range(3):
-        try:
-            msg = _get_openrouter().chat.completions.create(
-                model="google/gemini-2.0-flash-001",
-                max_tokens=80,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                f"This person will be placed in this scene: {scene_prompt}. "
-                                "Describe two things in one short phrase: "
-                                "1) their exact body build (e.g. slim, slender, athletic, curvy) "
-                                "2) a fitting outfit for the scene. "
-                                "Reply with ONLY 5-9 words, e.g. 'slim slender build, wearing a white sundress'. "
-                                "No explanation, no punctuation at the end."
-                            ),
-                        },
-                    ],
-                }],
-            )
-            return msg.choices[0].message.content.strip()
-        except Exception as e:
-            if attempt == 2:
-                return "slim build, wearing casual everyday clothes"
-            time.sleep(2 ** attempt)
 
 
 def _subscribe(model: str, arguments: dict, timeout: int = 120) -> dict:
@@ -150,34 +106,18 @@ async def tryon_in_scene(
 
 async def insert_into_scene(person_path: str, scene_prompt: str) -> str:
     """
-    Insert person into described scene.
-    Step 1 → face-to-full-portrait generates natural scene from scratch (proper lighting/shadows).
-    Step 2 → face-swap restores exact face from original photo.
+    Insert person into described scene using Nano Banana Pro (Gemini).
+    Single step — preserves face, body, and outfit naturally without face-swap.
     Returns CDN URL of the result image.
     """
     def _run():
         person_url = _upload(person_path)
-        style = _get_style_description(person_path, scene_prompt)
-
-        # Step 1: face-to-full-portrait — portrait shot in scene with reference photo
-        scene_result = _subscribe("fal-ai/flux-2-lora-gallery/face-to-full-portrait", {
+        result = _subscribe("fal-ai/nano-banana-pro/edit", {
             "image_urls": [person_url],
-            "prompt": f"{scene_prompt}, {style}, strictly preserve exact body proportions from reference, f/4 lens, natural rim lighting, well-lit face, slight angle, candid natural pose, professional portrait photography",
-            "image_size": "portrait_4_3",
-            "guidance_scale": 6.0,
-            "num_inference_steps": 50,
-            "num_images": 1,
-            "lora_scale": 1.0,
+            "prompt": f"Place this person in this scene: {scene_prompt}. Keep their face, hair, and outfit exactly the same.",
             "output_format": "jpeg",
         })
-        scene_url = scene_result["images"][0]["url"]
-
-        # Step 2: face-swap — restore exact face from original photo
-        final = _subscribe("fal-ai/face-swap", {
-            "base_image_url": scene_url,
-            "swap_image_url": person_url,
-        })
-        return final["image"]["url"]
+        return result["images"][0]["url"]
 
     return await asyncio.to_thread(_run)
 
