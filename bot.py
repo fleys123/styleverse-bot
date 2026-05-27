@@ -255,10 +255,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             label, scene_prompt = SCENE_PRESETS[int(idx)]
             context.user_data["state"] = STATE_IDLE
-            status_msg = await query.edit_message_text(
-                f"⏳ {label}...\nШаг 1: размещаю в сцене → Шаг 2: восстанавливаю лицо (~1-2 минуты)"
-            )
-            await _generate_scene(update, context, scene_prompt, status_msg)
+            status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
+            await _generate_scene(update, context, scene_prompt, status_msg, label)
 
 
 # ─── Photo handler ────────────────────────────────────────────────────────────
@@ -347,12 +345,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     state = context.user_data.get("state", STATE_IDLE)
     if state == STATE_WAITING_SCENE:
         scene_prompt = update.message.text
-        status_msg = await update.message.reply_text(
-            "⏳ Генерирую изображение...\n"
-            "Шаг 1: размещаю в сцене → Шаг 2: восстанавливаю лицо (~1-2 минуты)"
-        )
+        status_msg = await update.message.reply_text("⏳ Генерирую изображение...")
         context.user_data["state"] = STATE_IDLE
-        await _generate_scene(update, context, scene_prompt, status_msg)
+        await _generate_scene(update, context, scene_prompt, status_msg, scene_prompt)
     elif state == STATE_WAITING_REVIEW:
         review = update.message.text.strip()
         result_url = context.user_data.get("last_result_url")
@@ -449,7 +444,7 @@ async def _start_training(update, context, photo_paths: list, status_msg):
             pass
 
 
-async def _generate_scene(update, context, scene_prompt: str, status_msg):
+async def _generate_scene(update, context, scene_prompt: str, status_msg, label: str = ""):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
 
@@ -470,7 +465,8 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg):
         result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         database.increment_generation(user_id)
         await status_msg.delete()
-        await _send_result(chat_id, context, person_path, result_url, f"✨ Ты в сцене: {scene_prompt}")
+        caption = f"✨ {label}" if label else "✨ Готово!"
+        await _send_result(chat_id, context, person_path, result_url, caption)
     except Exception as e:
         logger.error(f"Scene failed for user {user_id}: {e}")
         err_lower = str(e).lower()
