@@ -113,7 +113,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📌 Статус: {status_str}"
         )
         if status == "vip" and sub_until:
-            text += f"\n📊 Использовано: {sub_gens}/50"
+            text += f"\n📊 Использовано: {sub_gens}/30"
 
         buttons = []
         buttons.append([InlineKeyboardButton("🎁 Подписка 30д", callback_data=f"adm_sub_{uid}")])
@@ -135,7 +135,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=uid,
                 text=(
                     f"🎁 Вам активирована подписка StyleVerse!\n\n"
-                    f"✅ 50 генераций на 30 дней\n"
+                    f"✅ 30 генераций на 30 дней\n"
                     f"📅 Действует до: {until_fmt}\n\n"
                     f"/start"
                 ),
