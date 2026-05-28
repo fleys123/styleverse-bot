@@ -452,6 +452,10 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg, label:
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
 
+    if context.user_data.get("generating"):
+        await status_msg.edit_text("⏳ Подожди, идёт генерация...")
+        return
+
     can_gen, reason = database.check_generation_access(user_id)
     if not can_gen:
         await status_msg.edit_text(_limit_message(reason), reply_markup=_limit_keyboard(reason))
@@ -465,11 +469,15 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg, label:
         )
         return
 
+    context.user_data["generating"] = True
     try:
         result_url = await ai_service.insert_into_scene(person_path, scene_prompt)
         database.increment_generation(user_id)
         await status_msg.delete()
         caption = f"✨ {label}" if label else "✨ Готово!"
+        gen_status = database.get_generation_status(user_id)
+        if gen_status:
+            caption += f"\n\n📊 {gen_status}"
         await _send_result(chat_id, context, person_path, result_url, caption)
     except Exception as e:
         logger.error(f"Scene failed for user {user_id}: {e}")
@@ -498,6 +506,8 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg, label:
             )
         except Exception:
             pass
+    finally:
+        context.user_data["generating"] = False
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────

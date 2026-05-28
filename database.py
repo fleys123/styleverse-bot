@@ -116,6 +116,23 @@ def is_banned(user_id: int) -> bool:
     return bool(row and row[0] == "banned")
 
 
+def get_generation_status(user_id: int) -> str | None:
+    """Returns a counter string to show after generation, or None for VIP unlimited."""
+    row = get_user(user_id)
+    if not row:
+        return None
+    _, _, _, _, gen_count, status, subscription_until, sub_gens_used = row
+    if status == "vip" and not subscription_until:
+        return None  # безлимитный VIP — не показываем
+    if status == "vip" and subscription_until:
+        remaining = SUB_LIMIT - sub_gens_used
+        return f"Использовано {sub_gens_used} из {SUB_LIMIT} генераций в этом месяце"
+    remaining = FREE_LIMIT - gen_count
+    if remaining > 0:
+        return f"Использовано {gen_count} из {FREE_LIMIT} бесплатных генераций"
+    return None
+
+
 def check_generation_access(user_id: int) -> tuple[bool, str]:
     row = get_user(user_id)
     if not row:
