@@ -127,7 +127,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Для лучшего результата:\n"
         "• Фото анфас, лицо чёткое\n"
         "• Хорошее освещение\n"
-        "• Ты одна в кадре",
+        "• Ты один/одна в кадре",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("📸 Попробовать бесплатно", callback_data="update_photo")]
         ])
