@@ -204,6 +204,28 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Чем лучше исходное фото — тем реалистичнее результат 👇"
         )
 
+    elif query.data == "buy_sub":
+        import payment as pay_module
+        try:
+            return_url = f"https://t.me/{context.bot.username}"
+            payment_id, pay_url = pay_module.create_payment(user_id, return_url)
+            await query.edit_message_text(
+                "💳 Оплата подписки StyleVerse\n\n"
+                "20 генераций на 30 дней — 799 ₽\n\n"
+                "Нажми кнопку ниже чтобы перейти к оплате.\n"
+                "После оплаты подписка активируется автоматически.",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("💳 Оплатить 799 ₽", url=pay_url)],
+                    [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
+                ]),
+            )
+        except Exception as e:
+            logger.error(f"Payment creation failed for {user_id}: {e}")
+            await query.edit_message_text(
+                "❌ Не удалось создать платёж. Попробуйте позже или напишите в поддержку: @Fleys2",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 В меню", callback_data="menu")]]),
+            )
+
     elif query.data == "scene":
         if not storage.has_profile_photo(user_id):
             await query.edit_message_text(
@@ -385,34 +407,26 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ADMIN_ID = 835360588
 
-SUB_PRICE = "400 ₽"
-SUB_LINK = "https://t.me/Fleys2"
-
-
 def _limit_message(reason: str) -> str:
     if reason == "free_limit":
         return (
             "✨ Вы использовали все 3 бесплатные генерации!\n\n"
-            "Оформите подписку — 20 генераций в месяц всего за 799 ₽.\n\n"
-            "Напишите нам, и мы поможем с оплатой 👇"
+            "Оформите подписку — 20 генераций в месяц всего за 799 ₽."
         )
     if reason == "sub_limit":
         return (
             "Вы использовали все 20 генераций за этот месяц.\n\n"
-            "Подписка автоматически обновится в следующем месяце. "
-            "Если хотите продлить раньше — напишите нам 👇"
+            "Подписка обновится в следующем месяце. "
+            "Если хотите продлить раньше — оформите новую 👇"
         )
     if reason == "sub_expired":
-        return (
-            "Срок вашей подписки истёк.\n\n"
-            "Оформите новую — 20 генераций в месяц за 799 ₽ 👇"
-        )
+        return "Срок вашей подписки истёк.\n\nОформите новую — 20 генераций за 799 ₽ 👇"
     return "Генерация недоступна. Напишите в поддержку."
 
 
 def _limit_keyboard(reason: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("💳 Оформить подписку", url=SUB_LINK)],
+        [InlineKeyboardButton("💳 Оформить подписку — 799 ₽", callback_data="buy_sub")],
         [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
     ])
 

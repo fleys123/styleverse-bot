@@ -14,6 +14,7 @@ logging.basicConfig(
 import database
 import bot as main_bot
 import admin_bot
+import webhook_server
 
 
 async def run():
@@ -21,6 +22,8 @@ async def run():
 
     app1 = main_bot.build_app()
     app2 = admin_bot.build_app()
+
+    webhook_server.set_bot_app(app1)
 
     await app1.initialize()
     await app2.initialize()
@@ -31,7 +34,9 @@ async def run():
     await app1.updater.start_polling()
     await app2.updater.start_polling()
 
-    logging.info("Both bots started successfully.")
+    webhook_runner = await webhook_server.start_webhook_server()
+
+    logging.info("Both bots and webhook server started successfully.")
 
     stop_event = asyncio.Event()
     loop = asyncio.get_event_loop()
@@ -40,6 +45,7 @@ async def run():
 
     await stop_event.wait()
 
+    await webhook_runner.cleanup()
     await app1.updater.stop()
     await app2.updater.stop()
     await app1.stop()
