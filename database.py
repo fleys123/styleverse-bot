@@ -6,7 +6,7 @@ _BASE = Path("/app/data") if Path("/app/data").exists() else Path(".")
 DB_PATH = _BASE / "styleverse.db"
 
 FREE_LIMIT = 3
-SUB_LIMIT = 30
+SUB_LIMIT = 20
 
 
 def _conn():
