@@ -134,6 +134,18 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def cmd_resetme(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_ID:
+        return
+    path = storage.PHOTO_DIR / f"{user_id}.jpg"
+    if path.exists():
+        path.unlink()
+    if user_id in storage._profile_photos:
+        del storage._profile_photos[user_id]
+    await update.message.reply_text("✅ Фото удалено. Теперь напиши /start")
+
+
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📖 СПРАВКА — StyleVerse\n\n"
@@ -527,6 +539,7 @@ def build_app() -> Application:
     )
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))
+    app.add_handler(CommandHandler("resetme", cmd_resetme))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
