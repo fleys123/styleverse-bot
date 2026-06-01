@@ -65,7 +65,7 @@ def get_user(user_id: int) -> tuple | None:
 def get_users(limit: int = 10, offset: int = 0) -> list[tuple]:
     with _conn() as db:
         return db.execute(
-            "SELECT user_id, username, full_name, joined_at, gen_count, status "
+            "SELECT user_id, username, full_name, joined_at, gen_count, status, subscription_until "
             "FROM users ORDER BY joined_at DESC LIMIT ? OFFSET ?",
             (limit, offset),
         ).fetchall()

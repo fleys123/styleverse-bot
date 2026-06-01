@@ -69,8 +69,15 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         buttons = []
-        for uid, username, full_name, joined, gens, status in users:
-            icon = "🎁" if status == "vip" else "🚫" if status == "banned" else "👤"
+        for uid, username, full_name, joined, gens, status, sub_until in users:
+            if status == "vip" and sub_until:
+                icon = "💳"
+            elif status == "vip":
+                icon = "👑"
+            elif status == "banned":
+                icon = "🚫"
+            else:
+                icon = "👤"
             name = f"@{username}" if username else full_name or str(uid)
             buttons.append([InlineKeyboardButton(f"{icon} {name} · {gens} gen", callback_data=f"adm_user_{uid}")])
 
