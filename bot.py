@@ -204,6 +204,25 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Чем лучше исходное фото — тем реалистичнее результат 👇"
         )
 
+    elif query.data.startswith("receipt_"):
+        uid = int(query.data.split("_")[1])
+        user = update.effective_user
+        name = f"@{user.username}" if user.username else user.full_name
+        await query.answer("Запрос отправлен, чек пришлём в ближайшее время.", show_alert=True)
+        try:
+            await context.bot.send_message(
+                chat_id=ADMIN_ID,
+                text=(
+                    f"🧾 Запрос чека об оплате\n\n"
+                    f"👤 {name}\n"
+                    f"🆔 ID: {uid}\n"
+                    f"💳 Сумма: 799 ₽\n\n"
+                    f"Выбей чек в «Мой налог» и отправь пользователю."
+                ),
+            )
+        except Exception:
+            pass
+
     elif query.data == "buy_sub":
         import payment as pay_module
         try:

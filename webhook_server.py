@@ -34,6 +34,7 @@ async def handle_yukassa(request: web.Request) -> web.Response:
 
         if _bot_app:
             try:
+                from telegram import InlineKeyboardButton, InlineKeyboardMarkup
                 await _bot_app.bot.send_message(
                     chat_id=user_id,
                     text=(
@@ -42,6 +43,9 @@ async def handle_yukassa(request: web.Request) -> web.Response:
                         f"📅 Подписка действует до: {until_fmt}\n\n"
                         f"/start"
                     ),
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("🧾 Нужен чек об оплате", callback_data=f"receipt_{user_id}")]
+                    ]),
                 )
             except Exception as e:
                 logger.error(f"Failed to notify user {user_id}: {e}")
