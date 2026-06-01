@@ -49,7 +49,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"👥 Всего пользователей: {s['total']}\n"
             f"🆕 За сегодня: {s['today']}\n"
             f"🎨 Генераций всего: {s['generations']}\n"
-            f"🎁 VIP: {s['vip']}\n"
+            f"💳 Активных подписок: {s['subs']}\n"
+            f"👑 VIP (безлимит): {s['vip'] - s['subs']}\n"
             f"🚫 Заблокировано: {s['banned']}"
         )
         await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup([

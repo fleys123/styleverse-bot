@@ -107,7 +107,11 @@ def get_stats() -> dict:
         gens   = db.execute("SELECT COALESCE(SUM(gen_count), 0) FROM users").fetchone()[0]
         vip    = db.execute("SELECT COUNT(*) FROM users WHERE status = 'vip'").fetchone()[0]
         banned = db.execute("SELECT COUNT(*) FROM users WHERE status = 'banned'").fetchone()[0]
-    return {"total": total, "today": today, "generations": gens, "vip": vip, "banned": banned}
+        subs   = db.execute(
+            "SELECT COUNT(*) FROM users WHERE status = 'vip' AND subscription_until IS NOT NULL "
+            "AND subscription_until > datetime('now')"
+        ).fetchone()[0]
+    return {"total": total, "today": today, "generations": gens, "vip": vip, "banned": banned, "subs": subs}
 
 
 def is_banned(user_id: int) -> bool:
