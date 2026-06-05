@@ -45,23 +45,48 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 SCENE_PRESETS = [
-    ("☕️ Кафе в Париже",       "sitting at a cozy Parisian cafe terrace with a coffee cup, golden morning light"),
-    ("🗼 Эйфелева башня",      "standing near the Eiffel Tower in Paris, sunny day, tourist photo"),
-    ("🌊 Санторини",           "on a white terrace in Santorini Greece, blue domes view, bright summer sun"),
-    ("🛍 Шопинг в Милане",     "walking on a luxury shopping street in Milan, boutique windows, elegant atmosphere"),
-    ("🌅 Закат на Бали",       "sitting on a swing over rice fields in Bali at sunset, tropical vibes"),
-    ("🎡 Монмартр",            "on a cobblestone street in Montmartre Paris, flowers and cafes around"),
-    ("🏖 Пляж Майорки",        "on a beautiful beach in Mallorca, turquoise water, white sand, summer"),
-    ("🌸 Цветущая сакура",     "standing under blooming cherry blossom trees in Japan, pink petals falling"),
-    ("🛥 Яхта в Монако",       "on a luxury yacht in Monaco harbour, glamorous summer look"),
-    ("🏙 Манхэттен",           "on a rooftop in Manhattan New York City, skyline view at golden hour"),
+    ("🖤 Чёрно-белое кино",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Photo-realistic black and white cinematic shot. Voluminous hair slightly blown by wind. "
+     "Girl in a voluminous white dress standing on dramatic coastal cliffs, heavy fog, moody grey sky. "
+     "Diffused natural lighting, cinematic and raw atmosphere. Film camera 85mm. 9:16 format."),
+
+    ("💫 Драматический портрет",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Close-up portrait, strong warm light source from the right casting dramatic shadow on left side of face. "
+     "Smooth skin texture, glossy natural lips, voluminous hair. Warm color palette with natural skin tones. "
+     "Hyper-realistic photography style. Intense and captivating mood. 9:16 format."),
+
+    ("📱 Кандид на iPhone",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Realistic candid snapshot on iPhone 15 Pro. Bright sunny day, high quality, live moment effect. "
+     "Photo looks spontaneous. Slight digital grain, natural sun glare, soft shadows. No studio look. "
+     "Girl sitting outdoors, natural background, cheerful natural expression. 9:16 format."),
+
+    ("🦸 Супергерой",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Cinematic superhero portrait. Person wearing a detailed superhero costume, dramatic studio lighting. "
+     "Epic composition, photo-realistic, cinematic atmosphere, dark dramatic background. "
+     "Movie poster quality. 9:16 format."),
+
+    ("🧱 LEGO",
+     "Create a high-quality LEGO minifigure character based on the person in the reference photo. "
+     "Use hairstyle, skin tone, facial expression and outfit as inspiration. "
+     "Translate key features — eyes, eyebrows, mouth and accessories — into the iconic LEGO minifigure aesthetic. "
+     "Hyper-realistic LEGO style, cinematic background. 9:16 format."),
+
+    ("🌟 Fashion съёмка",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "High-end editorial fashion photoshoot. Professional studio lighting, clean neutral beige background. "
+     "Vogue magazine aesthetic, elegant pose, stylish outfit. "
+     "Sharp details, professional model look, luxury fashion campaign quality. 9:16 format."),
 ]
 
 
 def main_menu_keyboard(has_photo: bool, has_lora: bool = False) -> InlineKeyboardMarkup:
     if has_photo:
         buttons = [
-            [InlineKeyboardButton("🌍 Вставить себя в сцену", callback_data="scene")],
+            [InlineKeyboardButton("✨ Создать фото по шаблону", callback_data="scene")],
             [InlineKeyboardButton("🔄 Обновить своё фото", callback_data="update_photo")],
         ]
     else:
@@ -121,9 +146,9 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✨ StyleVerse — окажись в любой точке мира\n\n"
         "Как это работает:\n\n"
         "1. 📸 Загружаешь своё фото\n"
-        "2. 🌍 Выбираешь локацию из готовых — Париж, Санторини, Милан и другие\n"
-        "3. ✏️ Или описываешь своё место — хоть яхта в Монако, хоть крыша в Токио\n"
-        "4. ✨ Нейросеть помещает тебя туда за 30 секунд\n\n"
+        "2. ✨ Выбираешь шаблон — чёрно-белое кино, драматический портрет, LEGO и другие\n"
+        "3. ✏️ Или описываешь своё — хоть яхта в Монако, хоть крыша в Токио\n"
+        "4. 🤖 Нейросеть создаёт твоё фото за 30 секунд\n\n"
         "Для лучшего результата:\n"
         "• Фото анфас, лицо чёткое\n"
         "• Хорошее освещение\n"
@@ -252,7 +277,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
         await query.edit_message_text(
-            "🌍 Выбери локацию или напиши своё описание:",
+            "✨ Выбери шаблон или напиши своё описание:",
             reply_markup=scene_preset_keyboard(),
         )
 
