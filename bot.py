@@ -46,34 +46,41 @@ RESULT_BTNS = InlineKeyboardMarkup([
 
 SCENE_PRESETS = [
     ("🖤 Чёрно-белое кино",
-     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
-     "Photo-realistic black and white cinematic shot. Voluminous hair slightly blown by wind. "
-     "Girl in a voluminous white dress standing on dramatic coastal cliffs, heavy fog, moody grey sky. "
-     "Diffused natural lighting, cinematic and raw atmosphere. Film camera 85mm. 9:16 format."),
+     "Used uploaded photo, don't change a face, don't distort and keep the face exactly as in the uploaded photo and create a candid snapshot captured on a low-quality disposable camera. "
+     "Photo-realistic close-up shot, only macro face shot, black and white, full voluminous hair, hair slightly blown by the wind falling across the face, "
+     "chin slightly raised, dreamy gaze, eyes closed, and she is smiling, voluminous white dress, squatting on wet textured seaside rocks. "
+     "The background features a dramatic large coastal cliff face under a heavily misty, overcast and moody grey sky. "
+     "The lighting is diffused and natural. The overall atmosphere is cinematic and raw. "
+     "Cinematic photo taken on a film camera 85mm. 9:16 format."),
 
-    ("💫 Драматический портрет",
+    ("💫 Портрет",
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
-     "Close-up portrait, strong warm light source from the right casting dramatic shadow on left side of face. "
-     "Smooth skin texture, glossy natural lips, voluminous hair. Warm color palette with natural skin tones. "
-     "Hyper-realistic photography style. Intense and captivating mood. 9:16 format."),
+     "Close-up portrait with focus on the right eye, nose and lips. Head slightly tilted to the left. "
+     "Right eye open looking directly at the camera, eye color same as in the photo, long defined lashes. "
+     "Thin strands of wet hair on forehead and cheek. High-contrast lighting, strong warm light source from the right "
+     "casting sharp shadow covering the left side of face including left eye and part of nose. "
+     "Smooth natural skin texture. Full glossy lips, natural pinkish-brown color. "
+     "Warm color palette, natural skin tones, laminated brows. "
+     "Intense and captivating mood, hyper-realistic photography style. 9:16 format."),
 
     ("📱 Кандид на iPhone",
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
      "Realistic candid snapshot on iPhone 15 Pro. Bright sunny day, high quality, live moment effect. "
-     "Photo looks spontaneous. Slight digital grain, natural sun glare, soft shadows. No studio look. "
-     "Girl sitting outdoors, natural background, cheerful natural expression. 9:16 format."),
+     "Photo looks spontaneous. Slight digital grain, natural sun glare, soft shadows. No studio look. 9:16 format."),
 
     ("🦸 Супергерой",
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
-     "Cinematic superhero portrait. Person wearing a detailed superhero costume, dramatic studio lighting. "
-     "Epic composition, photo-realistic, cinematic atmosphere, dark dramatic background. "
-     "Movie poster quality. 9:16 format."),
+     "Ultra-realistic photo, preserve exact appearance and natural face asymmetry strictly 1-to-1. No morphing, no retouching, keep skin texture. "
+     "Close-up portrait to chest, body turned three-quarters. Person holds a red superhero mask with black spider web pattern pressed to face with one hand. "
+     "Red costume with black grid lines and large black spider symbol on chest. Fabric and glove torn and dirty, hands with scratches. "
+     "Dark uniform background, one soft directional side light, high-contrast cinematic dramatic filter, deep shadows. "
+     "No text, logos or icons. 9:16 format."),
 
     ("🧱 LEGO",
-     "Create a high-quality LEGO minifigure character based on the person in the reference photo. "
-     "Use hairstyle, skin tone, facial expression and outfit as inspiration. "
-     "Translate key features — eyes, eyebrows, mouth and accessories — into the iconic LEGO minifigure aesthetic. "
-     "Hyper-realistic LEGO style, cinematic background. 9:16 format."),
+     "Create a high-quality LEGO minifigure character based on the person in the reference image, "
+     "use the hairstyle, skin theme, facial expression and suit as inspiration, "
+     "translate its key features such as eyes, eyebrows, mouth and accessories into the iconic aesthetic of the LEGO minifigure. "
+     "9:16 format."),
 
     ("🌟 Fashion съёмка",
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
