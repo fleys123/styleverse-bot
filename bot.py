@@ -87,6 +87,43 @@ SCENE_PRESETS = [
      "High-end editorial fashion photoshoot. Professional studio lighting, clean neutral beige background. "
      "Vogue magazine aesthetic, elegant pose, stylish outfit. "
      "Sharp details, professional model look, luxury fashion campaign quality. 9:16 format."),
+
+    ("🌺 У стены под цветами",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Photo-realistic portrait. Girl standing near a warm terracotta Mediterranean wall covered "
+     "with bright orange-pink bougainvillea flowers in full bloom. Casual elegant outfit. "
+     "Warm natural sunlight, soft shadows, dreamy summer atmosphere. "
+     "Cinematic quality, shallow depth of field. 9:16 format."),
+
+    ("🌸 Среди белых пионов",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Tender close-up portrait. Girl sitting among large white blooming peonies surrounding her. "
+     "Soft diffused light, pastel tones, gentle spring romantic atmosphere. "
+     "Dreamy and airy mood, shallow depth of field, natural beauty. 9:16 format."),
+
+    ("🏜️ В песках на закате",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "High-fashion editorial shot. Girl lying or sitting on smooth golden sand dunes at sunset. "
+     "Black elegant outfit, warm glowing sunset light from the horizon, long shadows. "
+     "Cinematic and dramatic atmosphere, luxury fashion campaign quality. 9:16 format."),
+
+    ("🦋 Портрет с бабочками",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Magical close-up portrait. White butterflies sitting on the girl's face and hands. "
+     "Warm golden light streaming through window blinds creating soft stripes of light and shadow. "
+     "Dreamy, ethereal and enchanting mood, hyper-realistic photography style. 9:16 format."),
+
+    ("🌿 В саду среди сирени",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Spring portrait in a blooming lilac garden. Girl surrounded by purple and white lilac flowers "
+     "with soft natural bokeh background. Warm golden hour light, gentle and romantic atmosphere. "
+     "Pinterest aesthetic, soft skin tones, dreamy depth of field. 9:16 format."),
+
+    ("🐎 В горах на лошади",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Cinematic shot of a girl sitting on a black horse in a lush green mountain valley. "
+     "Dramatic Caucasus mountain landscape, moody clouds, cinematic color grading. "
+     "Epic and powerful composition, natural lighting, high-end adventure fashion aesthetic. 9:16 format."),
 ]
 
 
