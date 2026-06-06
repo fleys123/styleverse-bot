@@ -68,16 +68,16 @@ def _save_preview_id(filename: str, file_id: str):
 
 # Индексы пресетов у которых есть превью → имя файла
 PRESET_PREVIEWS = {
-    0:  "01_chb_kino.jpg",
-    1:  "02_portret.jpg",
-    2:  "03_candid_iphone.jpg",
-    5:  "04_fashion.jpg",
-    6:  "05_bougainvillea.jpg",
-    7:  "06_peonies.jpg",
-    8:  "07_desert.jpg",
-    9:  "08_butterflies.jpg",
-    10: "09_lilac.jpg",
-    11: "10_horse.jpg",
+    0: "01_chb_kino.jpg",
+    1: "02_portret.jpg",
+    2: "03_candid_iphone.jpg",
+    3: "04_fashion.jpg",
+    4: "05_bougainvillea.jpg",
+    5: "06_peonies.jpg",
+    6: "07_desert.jpg",
+    7: "08_butterflies.jpg",
+    8: "09_lilac.jpg",
+    9: "10_horse.jpg",
 }
 
 # Превью для онбординга новых пользователей (3 лучших)
@@ -106,20 +106,6 @@ SCENE_PRESETS = [
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
      "Realistic candid snapshot on iPhone 15 Pro. Bright sunny day, high quality, live moment effect. "
      "Photo looks spontaneous. Slight digital grain, natural sun glare, soft shadows. No studio look. 9:16 format."),
-
-    ("🦸 Супергерой",
-     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
-     "Ultra-realistic photo, preserve exact appearance and natural face asymmetry strictly 1-to-1. No morphing, no retouching, keep skin texture. "
-     "Close-up portrait to chest, body turned three-quarters. Person holds a red superhero mask with black spider web pattern pressed to face with one hand. "
-     "Red costume with black grid lines and large black spider symbol on chest. Fabric and glove torn and dirty, hands with scratches. "
-     "Dark uniform background, one soft directional side light, high-contrast cinematic dramatic filter, deep shadows. "
-     "No text, logos or icons. 9:16 format."),
-
-    ("🧱 LEGO",
-     "Create a high-quality LEGO minifigure character based on the person in the reference image, "
-     "use the hairstyle, skin theme, facial expression and suit as inspiration, "
-     "translate its key features such as eyes, eyebrows, mouth and accessories into the iconic aesthetic of the LEGO minifigure. "
-     "9:16 format."),
 
     ("🌟 Fashion съёмка",
      "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
