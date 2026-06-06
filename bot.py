@@ -44,6 +44,20 @@ RESULT_BTNS = InlineKeyboardMarkup([
     [InlineKeyboardButton("🔙 В меню", callback_data="menu")],
 ])
 
+PREVIEWS_DIR = Path(__file__).parent / "previews"
+
+# Индексы пресетов у которых есть превью → имя файла
+PRESET_PREVIEWS = {
+    0:  "01_chb_kino.jpg",
+    6:  "05_bougainvillea.jpg",
+    7:  "06_peonies.jpg",
+    9:  "08_butterflies.jpg",
+    10: "09_lilac.jpg",
+}
+
+# Превью для онбординга новых пользователей (3 лучших)
+ONBOARDING_PREVIEWS = ["01_chb_kino.jpg", "05_bougainvillea.jpg", "06_peonies.jpg"]
+
 SCENE_PRESETS = [
     ("🖤 Чёрно-белое кино",
      "Used uploaded photo, don't change a face, don't distort and keep the face exactly as in the uploaded photo and create a candid snapshot captured on a low-quality disposable camera. "
@@ -186,11 +200,21 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    # Показываем примеры результатов
+    preview_media = []
+    for i, fname in enumerate(ONBOARDING_PREVIEWS):
+        path = PREVIEWS_DIR / fname
+        if path.exists():
+            caption = "✨ Смотри что получается 👇" if i == 0 else ""
+            preview_media.append(InputMediaPhoto(open(path, "rb"), caption=caption))
+    if preview_media:
+        await update.message.reply_media_group(media=preview_media)
+
     await update.message.reply_text(
-        "✨ StyleVerse — окажись в любой точке мира\n\n"
+        "✨ StyleVerse — нейросеть создаст крутые фото с тобой\n\n"
         "Как это работает:\n\n"
         "1. 📸 Загружаешь своё фото\n"
-        "2. ✨ Выбираешь шаблон — чёрно-белое кино, драматический портрет, LEGO и другие\n"
+        "2. ✨ Выбираешь шаблон — чёрно-белое кино, пионы, бабочки и другие\n"
         "3. ✏️ Или описываешь своё — хоть яхта в Монако, хоть крыша в Токио\n"
         "4. 🤖 Нейросеть создаёт твоё фото за 30 секунд\n\n"
         "Для лучшего результата:\n"
@@ -359,6 +383,13 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         asyncio.create_task(_start_training(update, context, photos, status_msg))
 
+    elif query.data.startswith("sp_gen_"):
+        idx = int(query.data[7:])
+        label, scene_prompt = SCENE_PRESETS[idx]
+        context.user_data["state"] = STATE_IDLE
+        status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
+        await _generate_scene(update, context, scene_prompt, status_msg, label)
+
     elif query.data.startswith("sp_"):
         idx = query.data[3:]
         if idx == "custom":
@@ -368,10 +399,25 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Например: 'в кафе в Париже утром' или 'на яхте в Средиземном море'"
             )
         else:
-            label, scene_prompt = SCENE_PRESETS[int(idx)]
-            context.user_data["state"] = STATE_IDLE
-            status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
-            await _generate_scene(update, context, scene_prompt, status_msg, label)
+            idx_int = int(idx)
+            label, scene_prompt = SCENE_PRESETS[idx_int]
+            preview_file = PRESET_PREVIEWS.get(idx_int)
+            preview_path = PREVIEWS_DIR / preview_file if preview_file else None
+
+            if preview_path and preview_path.exists():
+                await query.edit_message_text(f"Шаблон: {label}")
+                await query.message.reply_photo(
+                    photo=open(preview_path, "rb"),
+                    caption="Получится примерно вот так ✨",
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("✨ Сгенерировать", callback_data=f"sp_gen_{idx_int}")],
+                        [InlineKeyboardButton("🔙 Назад", callback_data="scene")],
+                    ]),
+                )
+            else:
+                context.user_data["state"] = STATE_IDLE
+                status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
+                await _generate_scene(update, context, scene_prompt, status_msg, label)
 
 
 # ─── Photo handler ────────────────────────────────────────────────────────────
