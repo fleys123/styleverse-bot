@@ -57,3 +57,12 @@ def get_user_lora(user_id: int) -> dict | None:
 
 def has_user_lora(user_id: int) -> bool:
     return (LORA_DIR / f"{user_id}.json").exists()
+
+
+def delete_profile_photo(user_id: int) -> bool:
+    _profile_photos.pop(user_id, None)
+    path = PHOTO_DIR / f"{user_id}.jpg"
+    if path.exists():
+        path.unlink()
+        return True
+    return False

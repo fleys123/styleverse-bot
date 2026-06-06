@@ -5,6 +5,7 @@ from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes
 
 import database
+import storage
 
 
 def _main_bot() -> Bot:
@@ -124,7 +125,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text += f"\n📊 Использовано: {sub_gens}/20"
 
         buttons = []
-        buttons.append([InlineKeyboardButton("🎁 Подписка 30д", callback_data=f"adm_sub_{uid}")])
+        buttons.append([InlineKeyboardButton("🗑 Удалить фото", callback_data=f"adm_delphoto_{uid}")])
         buttons.append([InlineKeyboardButton("👑 VIP (безлимит)", callback_data=f"adm_vip_{uid}")])
         if status != "banned":
             buttons.append([InlineKeyboardButton("🚫 Заблокировать", callback_data=f"adm_ban_{uid}")])
@@ -184,6 +185,16 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         uid = int(data.split("_")[2])
         database.set_status(uid, "active")
         await query.answer("✅ Статус сброшен!", show_alert=True)
+        query.data = f"adm_user_{uid}"
+        await handle_callback(update, context)
+
+    elif data.startswith("adm_delphoto_"):
+        uid = int(data.split("_")[2])
+        deleted = storage.delete_profile_photo(uid)
+        if deleted:
+            await query.answer("🗑 Фото удалено!", show_alert=True)
+        else:
+            await query.answer("Фото не найдено.", show_alert=True)
         query.data = f"adm_user_{uid}"
         await handle_callback(update, context)
 
