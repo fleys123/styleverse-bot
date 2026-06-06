@@ -49,10 +49,15 @@ PREVIEWS_DIR = Path(__file__).parent / "previews"
 # Индексы пресетов у которых есть превью → имя файла
 PRESET_PREVIEWS = {
     0:  "01_chb_kino.jpg",
+    1:  "02_portret.jpg",
+    2:  "03_candid_iphone.jpg",
+    5:  "04_fashion.jpg",
     6:  "05_bougainvillea.jpg",
     7:  "06_peonies.jpg",
+    8:  "07_desert.jpg",
     9:  "08_butterflies.jpg",
     10: "09_lilac.jpg",
+    11: "10_horse.jpg",
 }
 
 # Превью для онбординга новых пользователей (3 лучших)
@@ -340,14 +345,21 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data == "scene":
         if not storage.has_profile_photo(user_id):
-            await query.edit_message_text(
-                "Сначала загрузи своё фото!", reply_markup=main_menu_keyboard(False)
-            )
+            try:
+                await query.edit_message_text("Сначала загрузи своё фото!", reply_markup=main_menu_keyboard(False))
+            except Exception:
+                await query.message.reply_text("Сначала загрузи своё фото!", reply_markup=main_menu_keyboard(False))
             return
-        await query.edit_message_text(
-            "✨ Выбери шаблон или напиши своё описание:",
-            reply_markup=scene_preset_keyboard(),
-        )
+        try:
+            await query.edit_message_text(
+                "✨ Выбери шаблон или напиши своё описание:",
+                reply_markup=scene_preset_keyboard(),
+            )
+        except Exception:
+            await query.message.reply_text(
+                "✨ Выбери шаблон или напиши своё описание:",
+                reply_markup=scene_preset_keyboard(),
+            )
 
     elif query.data == "train_lora":
         if not storage.has_profile_photo(user_id):
