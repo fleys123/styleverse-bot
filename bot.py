@@ -376,6 +376,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=scene_preset_keyboard(),
             )
         except Exception:
+            try:
+                await query.message.delete()
+            except Exception:
+                pass
             await query.message.reply_text(
                 "✨ Выбери шаблон или напиши своё описание:",
                 reply_markup=scene_preset_keyboard(),
@@ -437,11 +441,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             preview_path = PREVIEWS_DIR / preview_file if preview_file else None
 
             if preview_path and preview_path.exists():
-                await query.edit_message_text(f"Шаблон: {label}")
                 cached_id = _preview_ids.get(preview_file)
                 msg = await query.message.reply_photo(
                     photo=cached_id if cached_id else open(preview_path, "rb"),
-                    caption="Получится примерно вот так ✨",
+                    caption=f"{label}\n\nПолучится примерно вот так ✨",
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton("✨ Сгенерировать", callback_data=f"sp_gen_{idx_int}")],
                         [InlineKeyboardButton("🔙 Назад", callback_data="scene")],
@@ -449,6 +452,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 if not cached_id:
                     _save_preview_id(preview_file, msg.photo[-1].file_id)
+                try:
+                    await query.message.delete()
+                except Exception:
+                    pass
             else:
                 context.user_data["state"] = STATE_IDLE
                 status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
