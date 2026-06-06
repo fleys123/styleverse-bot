@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 from pathlib import Path
@@ -45,6 +46,25 @@ RESULT_BTNS = InlineKeyboardMarkup([
 ])
 
 PREVIEWS_DIR = Path(__file__).parent / "previews"
+PREVIEW_IDS_FILE = PREVIEWS_DIR / "file_ids.json"
+_preview_ids: dict = {}
+
+
+def _load_preview_ids():
+    global _preview_ids
+    if PREVIEW_IDS_FILE.exists():
+        try:
+            _preview_ids = json.loads(PREVIEW_IDS_FILE.read_text())
+        except Exception:
+            _preview_ids = {}
+
+
+def _save_preview_id(filename: str, file_id: str):
+    _preview_ids[filename] = file_id
+    try:
+        PREVIEW_IDS_FILE.write_text(json.dumps(_preview_ids))
+    except Exception:
+        pass
 
 # Индексы пресетов у которых есть превью → имя файла
 PRESET_PREVIEWS = {
@@ -418,14 +438,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if preview_path and preview_path.exists():
                 await query.edit_message_text(f"Шаблон: {label}")
-                await query.message.reply_photo(
-                    photo=open(preview_path, "rb"),
+                cached_id = _preview_ids.get(preview_file)
+                msg = await query.message.reply_photo(
+                    photo=cached_id if cached_id else open(preview_path, "rb"),
                     caption="Получится примерно вот так ✨",
                     reply_markup=InlineKeyboardMarkup([
                         [InlineKeyboardButton("✨ Сгенерировать", callback_data=f"sp_gen_{idx_int}")],
                         [InlineKeyboardButton("🔙 Назад", callback_data="scene")],
                     ]),
                 )
+                if not cached_id:
+                    _save_preview_id(preview_file, msg.photo[-1].file_id)
             else:
                 context.user_data["state"] = STATE_IDLE
                 status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
@@ -674,6 +697,7 @@ async def _generate_scene(update, context, scene_prompt: str, status_msg, label:
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def build_app() -> Application:
+    _load_preview_ids()
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
         raise ValueError("Укажи TELEGRAM_BOT_TOKEN в .env")
@@ -696,4 +720,5 @@ def build_app() -> Application:
 
 if __name__ == "__main__":
     database.init_db()
+    _load_preview_ids()
     build_app().run_polling()
