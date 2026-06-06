@@ -409,7 +409,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         idx = int(query.data[7:])
         label, scene_prompt = SCENE_PRESETS[idx]
         context.user_data["state"] = STATE_IDLE
-        status_msg = await query.edit_message_text(f"⏳ Генерирую: {label}...")
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+        status_msg = await query.message.reply_text(f"⏳ Генерирую: {label}...")
         await _generate_scene(update, context, scene_prompt, status_msg, label)
 
     elif query.data.startswith("sp_"):
