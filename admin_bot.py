@@ -125,6 +125,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text += f"\n📊 Использовано: {sub_gens}/20"
 
         buttons = []
+        buttons.append([InlineKeyboardButton("🎁 Подписка 30д", callback_data=f"adm_sub_{uid}")])
         buttons.append([InlineKeyboardButton("🗑 Удалить фото", callback_data=f"adm_delphoto_{uid}")])
         buttons.append([InlineKeyboardButton("👑 VIP (безлимит)", callback_data=f"adm_vip_{uid}")])
         if status != "banned":
