@@ -149,6 +149,24 @@ SCENE_PRESETS = [
      "Cinematic shot of a girl sitting on a black horse in a lush green mountain valley. "
      "Dramatic Caucasus mountain landscape, moody clouds, cinematic color grading. "
      "Epic and powerful composition, natural lighting, high-end adventure fashion aesthetic. 9:16 format."),
+
+    ("👻 Очень страшное кино",
+     "Used uploaded photo, don't change a face, keep the face exactly as in the uploaded photo. "
+     "Photo-realistic selfie 3:4. "
+     "Girl with even glowing skin, soft dusty-pink blush, light wet highlighter on cheekbones, glossy lips with nude contour slightly darker than the gloss, mouth slightly open. "
+     "Shiny hair with visible texture, slightly messy and wet, strands falling on face from both sides. "
+     "Long square nails, bordeaux glossy finish. Thin gold chain on neck. "
+     "Shot on iPhone 17 Pro front camera (phone not visible), nighttime, completely dark room, no flash. "
+     "Only light source — red neon strip on the wall reflecting red highlights on skin, body and hair. "
+     "Slight imperfection of the shot, accidental live moment effect, high quality, high texture detail, realism. "
+     "Dark room background, large red neon strip on wall in casual waves. "
+     "Girl wearing black synthetic top with lace trim. "
+     "Behind her close — a person in full black outfit, black fabric gloves, Ghostface mask from Scream movie. "
+     "His hand rests on her head with strands of hair on her face, other hand on her shoulder. "
+     "Girl's face slightly turned sideways, finger near mouth. "
+     "High resolution, cinematic grain, natural skin texture with visible pores and light glow on raised areas. "
+     "No heavy HDR or full face retouching. High detail of face, clothing, lace, neon strip, mask, gloves. "
+     "Looks like a candid live selfie. Face exactly as in the reference photo. 9:16 format."),
 ]
 
 
