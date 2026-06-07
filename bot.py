@@ -68,16 +68,17 @@ def _save_preview_id(filename: str, file_id: str):
 
 # Индексы пресетов у которых есть превью → имя файла
 PRESET_PREVIEWS = {
-    0: "01_chb_kino.jpg",
-    1: "02_portret.jpg",
-    2: "03_candid_iphone.jpg",
-    3: "04_fashion.jpg",
-    4: "05_bougainvillea.jpg",
-    5: "06_peonies.jpg",
-    6: "07_desert.jpg",
-    7: "08_butterflies.jpg",
-    8: "09_lilac.jpg",
-    9: "10_horse.jpg",
+    0:  "01_chb_kino.jpg",
+    1:  "02_portret.jpg",
+    2:  "03_candid_iphone.jpg",
+    3:  "04_fashion.jpg",
+    4:  "05_bougainvillea.jpg",
+    5:  "06_peonies.jpg",
+    6:  "07_desert.jpg",
+    7:  "08_butterflies.jpg",
+    8:  "09_lilac.jpg",
+    9:  "10_horse.jpg",
+    10: "11_ghostface.jpg",
 }
 
 # Превью для онбординга новых пользователей (3 лучших)
